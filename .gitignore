@@ -1,0 +1,6 @@
+node_modules/
+backend/env/
+__pycache__/
+backend/models/*.pt
+backend/models/*.pth
+.env
