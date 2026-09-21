@@ -4,3 +4,7 @@ __pycache__/
 backend/models/*.pt
 backend/models/*.pth
 .env
+
+model/
+.png
+.tiff
