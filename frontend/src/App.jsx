@@ -1,121 +1,99 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import Navbar from './components/Navbar'
+import SampleGallery from './components/SampleGallery'
+import InputImagePanel from './components/InputImagePanel'
+import ClinicalInfoPanel from './components/ClinicalInfoPanel'
+import AnalysisPanel from './components/AnalysisPanel'
+import { SAMPLES, parseFilename } from './services/sampleData'
+import { analyzeImageMock /* swap to analyzeImage when Backend is ready */ } from './services/api'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [selectedSample, setSelectedSample] = useState(null)
+  const [isAnalyzing, setIsAnalyzing]       = useState(false)
+  const [result, setResult]                 = useState(null)
+
+  const handleSelectSample = (sample) => {
+    setSelectedSample(sample)
+    setResult(null) // clear old result when selecting new image
+  }
+
+  const handleAnalyze = async () => {
+    if (!selectedSample || isAnalyzing) return
+    setIsAnalyzing(true)
+    setResult(null)
+    try {
+      const data = await analyzeImageMock(selectedSample.id, selectedSample.img)
+      setResult(data)
+    } catch (err) {
+      console.error('Analysis error:', err)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const metadata = selectedSample ? parseFilename(selectedSample.id) : null
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app">
+      <Navbar />
 
-      <div className="ticks"></div>
+      <div className="page-header">
+        <h1 className="page-title">Retinal Image Analysis</h1>
+        <p className="page-subtitle">
+          Analyze fundus photographs for lesion distribution and structural density
+        </p>
+      </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <div className="main-content">
+        {/* ── LEFT COLUMN CARDS ── */}
+        <div className="left-column">
+          <SampleGallery
+            samples={SAMPLES}
+            selected={selectedSample}
+            onSelect={handleSelectSample}
+          />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <InputImagePanel sample={selectedSample} />
+
+          <ClinicalInfoPanel metadata={metadata} />
+        </div>
+
+        {/* ── RIGHT COLUMN CARDS ── */}
+        <div className="right-column">
+          <AnalysisPanel
+            result={result}
+            isAnalyzing={isAnalyzing}
+            sample={selectedSample}
+          />
+        </div>
+
+        {/* ── LEFT ACTION BUTTON ── */}
+        <div className="left-action">
+          <button
+            type="button"
+            className="action-btn analyze-btn"
+            onClick={handleAnalyze}
+            disabled={!selectedSample || isAnalyzing}
+          >
+            {isAnalyzing ? 'Analyzing...' : 'Analyze image'}
+          </button>
+        </div>
+
+        {/* ── RIGHT ACTION BUTTON ── */}
+        <div className="right-action">
+          {result && (
+            <button
+              type="button"
+              className="action-btn download-btn"
+              onClick={() => alert('PDF export will be available once the Backend is connected.')}
+            >
+              Download PDF Report
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
