@@ -48,13 +48,13 @@ function App() {
       <div className="main-content">
         {/* ── LEFT COLUMN CARDS ── */}
         <div className="left-column">
+          <InputImagePanel sample={selectedSample} />
+
           <SampleGallery
             samples={SAMPLES}
             selected={selectedSample}
             onSelect={handleSelectSample}
           />
-
-          <InputImagePanel sample={selectedSample} />
 
           <ClinicalInfoPanel metadata={metadata} />
         </div>

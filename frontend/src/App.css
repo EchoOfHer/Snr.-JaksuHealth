@@ -293,9 +293,20 @@
 /* ===========================
    INPUT IMAGE PANEL
 =========================== */
-.input-panel-header {
+.panel-top-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  height: 24px;
+  margin-bottom: 6px;
+}
+
+.panel-sub-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+  height: 20px;
+  display: flex;
   align-items: center;
   margin-bottom: 12px;
 }
@@ -307,6 +318,11 @@
   background: #f3f3f3;
   padding: 3px 10px;
   border-radius: 50px;
+}
+
+.step-badge.step-result {
+  background: #fff0e6;
+  color: var(--primary);
 }
 
 .input-image-body {
@@ -677,23 +693,158 @@
   color: #b45309;
 }
 
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* ===========================
-   RESPONSIVE
+   RESPONSIVE DESIGN (TABLET & MOBILE)
 =========================== */
 @media (max-width: 960px) {
   .main-content {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding: 0 16px 32px;
   }
 
-  .left-action,
+  /* Logical Mobile Flow: Input Stack -> Analyze Button -> Analysis Results -> Download Button */
+  .left-column {
+    order: 1;
+    width: 100%;
+  }
+
+  .left-action {
+    order: 2;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .right-column {
+    order: 3;
+    width: 100%;
+  }
+
   .right-action {
+    order: 4;
     width: 100%;
   }
 
   .action-btn {
     width: 100%;
-    max-width: 320px;
+    max-width: 380px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Mobile Navbar */
+  .navbar {
+    top: 6px;
+    left: 10px;
+    right: 10px;
+    height: 52px;
+    padding: 0 16px;
+    border-radius: 26px;
+  }
+
+  .navbar-brand {
+    font-size: 18px;
+  }
+
+  .navbar-logo img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .navbar-time {
+    font-size: 12px;
+  }
+
+  .app {
+    padding-top: 72px;
+  }
+
+  /* Mobile Header */
+  .page-header {
+    padding: 10px 14px 10px;
+  }
+
+  .page-title {
+    font-size: 21px;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+  }
+
+  /* Main Container & Cards */
+  .main-content {
+    padding: 0 10px 24px;
+    gap: 12px;
+  }
+
+  .card {
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
+
+  /* Mobile Carousel */
+  .gallery-carousel-wrapper {
+    height: 96px;
+  }
+
+  .gallery-card-item {
+    width: 58px;
+    height: 58px;
+    transform: translateX(calc(var(--pos) * 62px))
+               scale(calc(1 - var(--dist) * 0.16));
+  }
+
+  .gallery-card-item.center-active {
+    transform: translateX(0) scale(1.22);
+  }
+
+  .carousel-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+  }
+
+  /* Mobile Image Containers */
+  .await-zone,
+  .image-zone,
+  .biomarker-image {
+    height: 200px;
+  }
+
+  /* Clinical Info inputs on small screens */
+  .clinical-fields {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Metrics 3-column layout on small screens */
+  .metrics-grid {
+    gap: 6px;
+  }
+
+  .metric-card {
+    padding: 10px 8px;
+  }
+
+  .metric-value {
+    font-size: 20px;
+  }
+
+  .metric-name {
+    font-size: 10px;
+  }
+
+  /* Full-width tap targets for mobile */
+  .action-btn {
+    max-width: 100%;
   }
 }

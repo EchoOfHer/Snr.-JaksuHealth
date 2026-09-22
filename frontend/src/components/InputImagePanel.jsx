@@ -1,9 +1,12 @@
 export default function InputImagePanel({ sample }) {
   return (
     <div className="card">
-      <div className="input-panel-header">
+      <div className="panel-top-header">
         <span className="card-header" style={{ marginBottom: 0 }}>Input Image</span>
         <span className="step-badge">Step 1</span>
+      </div>
+      <div className="panel-sub-label">
+        <span>Original Fundus</span>
       </div>
 
       <div className="input-image-body">
@@ -15,7 +18,7 @@ export default function InputImagePanel({ sample }) {
           <div className="await-zone">
             <EmptyRetina />
             <span className="await-title">No image selected</span>
-            <span className="await-subtitle">Choose a sample above to preview</span>
+            <span className="await-subtitle">Choose a sample below to preview</span>
           </div>
         )}
       </div>

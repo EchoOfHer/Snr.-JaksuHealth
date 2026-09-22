@@ -1,7 +1,13 @@
 export default function AnalysisPanel({ result, isAnalyzing, sample }) {
   return (
     <div className="card analysis-panel">
-      <div className="analysis-header">Analysis</div>
+      <div className="panel-top-header">
+        <span className="card-header" style={{ marginBottom: 0 }}>Analysis</span>
+        <span className="step-badge step-result">Step 2</span>
+      </div>
+      <div className="panel-sub-label">
+        <span>Biomarker Visualisation</span>
+      </div>
 
       {isAnalyzing ? (
         <div className="analysis-await">
@@ -17,9 +23,6 @@ export default function AnalysisPanel({ result, isAnalyzing, sample }) {
 
           {/* Biomarker Visualisation */}
           <div className="result-section">
-            <div className="section-label-row">
-              <span className="section-label">Biomarker Visualisation</span>
-            </div>
             <div className="biomarker-image">
               <img src={result.biomarker_image ?? sample?.img} alt="Biomarker Visualisation" />
             </div>
@@ -52,40 +55,42 @@ export default function AnalysisPanel({ result, isAnalyzing, sample }) {
           {/* Spatial Distribution */}
           <div className="result-section">
             <span className="section-label">Spatial Distribution Breakdown</span>
-            <table className="lesion-table">
-              <thead>
-                <tr>
-                  <th>Lesion Type</th>
-                  <th>Count</th>
-                  <th>Area %</th>
-                  <th>Largest (μm)</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.lesions.map((lesion) => (
-                  <tr key={lesion.type}>
-                    <td>
-                      <div className="lesion-type-cell">
-                        <span
-                          className={`lesion-dot${lesion.color ? '' : ' empty'}`}
-                          style={lesion.color ? { background: lesion.color } : {}}
-                        />
-                        <span>{lesion.type}</span>
-                      </div>
-                    </td>
-                    <td className="td-number">{lesion.count}</td>
-                    <td className="td-muted">{lesion.area_percentage}</td>
-                    <td className="td-number">{lesion.largest_spot}</td>
-                    <td>
-                      <span className={`status-badge status-${lesion.status.toLowerCase()}`}>
-                        {lesion.status}
-                      </span>
-                    </td>
+            <div className="table-responsive-wrapper">
+              <table className="lesion-table">
+                <thead>
+                  <tr>
+                    <th>Lesion Type</th>
+                    <th>Count</th>
+                    <th>Area %</th>
+                    <th>Largest (μm)</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {result.lesions.map((lesion) => (
+                    <tr key={lesion.type}>
+                      <td>
+                        <div className="lesion-type-cell">
+                          <span
+                            className={`lesion-dot${lesion.color ? '' : ' empty'}`}
+                            style={lesion.color ? { background: lesion.color } : {}}
+                          />
+                          <span>{lesion.type}</span>
+                        </div>
+                      </td>
+                      <td className="td-number">{lesion.count}</td>
+                      <td className="td-muted">{lesion.area_percentage}</td>
+                      <td className="td-number">{lesion.largest_spot}</td>
+                      <td>
+                        <span className={`status-badge status-${lesion.status.toLowerCase()}`}>
+                          {lesion.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
