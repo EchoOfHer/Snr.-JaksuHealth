@@ -6,7 +6,10 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 export async function analyzeImage(sampleId) {
   const res = await fetch(`${BASE_URL}/predict`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true'
+    },
     body: JSON.stringify({ sample_id: sampleId }),
   })
   if (!res.ok) throw new Error(`Analysis failed: ${res.status}`)
@@ -115,6 +118,7 @@ export async function analyzeImageFile(file) {
 
   const res = await fetch(`${BASE_URL}/api/predict`, {
     method: 'POST',
+    headers: { 'ngrok-skip-browser-warning': 'true' },
     body: formData,
   })
   if (!res.ok) throw new Error(`Image file analysis failed: ${res.status}`)
@@ -184,7 +188,10 @@ export async function analyzeImageFile(file) {
  */
 export async function checkHealth() {
   try {
-    const res = await fetch(`${BASE_URL}/api/status`, { method: 'GET' })
+    const res = await fetch(`${BASE_URL}/api/status`, { 
+      method: 'GET',
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    })
     return res.ok
   } catch {
     return false
@@ -210,7 +217,10 @@ export async function analyzeImageWithFallback(sampleId, imageUrl) {
 export async function exportReportPDF(result, metadata) {
   const res = await fetch(`${BASE_URL}/export-pdf`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true'
+    },
     body: JSON.stringify({ result, metadata }),
   })
   if (!res.ok) throw new Error(`PDF export failed: ${res.status}`)
