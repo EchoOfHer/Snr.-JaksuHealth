@@ -1,118 +1,145 @@
-export default function AnalysisPanel({ result, isAnalyzing, sample }) {
-  return (
-    <div className="card analysis-panel">
-      <div className="panel-top-header">
-        <span className="card-header" style={{ marginBottom: 0 }}>Analysis</span>
-        <span className="step-badge step-result">Step 2</span>
-      </div>
-      <div className="panel-sub-label">
-        <span>Biomarker Visualisation</span>
-      </div>
+const DEFAULT_LESIONS = [
+  { type: 'Drusen', color: '#9333ea' },
+  { type: 'Hard Exudate', color: '#8e8e93' },
+  { type: 'Hemorrhages', color: '#0071e3' },
+]
 
-      {isAnalyzing ? (
-        <div className="analysis-await">
-          <div className="spinner" />
-          <span className="await-title">Processing...</span>
-          <span className="await-subtitle">
-            Analyzing retinal image for biomarkers and lesion distribution
-          </span>
-        </div>
+function formatSeverity(val) {
+  if (!val && val !== 0) return '—'
+  if (typeof val === 'string') {
+    const trimmed = val.trim()
+    const match = [
+      'No disease',
+      'Normal aging',
+      'Early',
+      'Intermediate',
+      'Advanced',
+    ].find((s) => s.toLowerCase() === trimmed.toLowerCase())
+    if (match) return match
+  }
 
-      ) : result ? (
-        <div className="analysis-content">
+  const num = Number(val)
+  if (num === 0) return 'No disease'
+  if (num === 1) return 'Normal aging'
+  if (num === 2) return 'Early'
+  if (num === 3) return 'Intermediate'
+  if (num >= 4) return 'Advanced'
 
-          {/* Biomarker Visualisation */}
-          <div className="result-section">
-            <div className="biomarker-image">
-              <img src={result.biomarker_image ?? sample?.img} alt="Biomarker Visualisation" />
-            </div>
-          </div>
-
-          {/* Metrics */}
-          <div className="result-section">
-            <span className="section-label">Analysis Metrics</span>
-            <div className="metrics-grid">
-              <div className="metric-card">
-                <div className="metric-name">Confidence</div>
-                <div className="metric-value orange">{result.confidence}%</div>
-                <div className="metric-bar">
-                  <div className="metric-bar-fill" style={{ width: `${result.confidence}%` }} />
-                </div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-name">Total Lesions</div>
-                <div className="metric-value dark">{result.total_lesion}</div>
-                <div className="metric-tag">detected</div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-name">Severity Level</div>
-                <div className="metric-value dark">{result.severity_level}</div>
-                <div className="metric-tag severity">of 5</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Spatial Distribution */}
-          <div className="result-section">
-            <span className="section-label">Spatial Distribution Breakdown</span>
-            <div className="table-responsive-wrapper">
-              <table className="lesion-table">
-                <thead>
-                  <tr>
-                    <th>Lesion Type</th>
-                    <th>Count</th>
-                    <th>Area %</th>
-                    <th>Largest (μm)</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.lesions.map((lesion) => (
-                    <tr key={lesion.type}>
-                      <td>
-                        <div className="lesion-type-cell">
-                          <span
-                            className={`lesion-dot${lesion.color ? '' : ' empty'}`}
-                            style={lesion.color ? { background: lesion.color } : {}}
-                          />
-                          <span>{lesion.type}</span>
-                        </div>
-                      </td>
-                      <td className="td-number">{lesion.count}</td>
-                      <td className="td-muted">{lesion.area_percentage}</td>
-                      <td className="td-number">{lesion.largest_spot}</td>
-                      <td>
-                        <span className={`status-badge status-${lesion.status.toLowerCase()}`}>
-                          {lesion.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-      ) : (
-        <div className="analysis-await">
-          <EmptyIcon />
-          <span className="await-title">No data yet</span>
-          <span className="await-subtitle">
-            Select a sample image and click Analyze to begin
-          </span>
-        </div>
-      )}
-    </div>
-  )
+  return String(val)
 }
 
-function EmptyIcon() {
+export default function AnalysisPanel({ result, isAnalyzing, sample }) {
+  const lesions = result?.lesions ?? DEFAULT_LESIONS.map((l) => ({
+    type: l.type,
+    color: l.color,
+    count: '—',
+    area_percentage: '—',
+    largest_spot: '—',
+    status: 'Pending',
+  }))
+
+  const severityText = result
+    ? formatSeverity(result.severity ?? result.severity_level)
+    : '—'
+
   return (
-    <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-      <circle cx="28" cy="28" r="24" stroke="#E0E0E0" strokeWidth="2" strokeDasharray="4 3" />
-      <circle cx="28" cy="28" r="14" stroke="#E0E0E0" strokeWidth="1.5" />
-      <circle cx="28" cy="28" r="5" fill="#E0E0E0" />
-    </svg>
+    <div className="analysis-wrapper">
+      {/* Visual Canvas */}
+      <div className="canvas-frame">
+        {isAnalyzing ? (
+          <div className="analyzing-state">
+            <div className="apple-spinner" />
+            <p className="analyzing-text">Analyzing retina...</p>
+          </div>
+        ) : result ? (
+          <img
+            src={result.biomarker_image ?? sample?.img}
+            alt="Biomarker"
+            className="retina-image"
+          />
+        ) : (
+          <div className="empty-canvas">
+            <span>Ready for analysis</span>
+          </div>
+        )}
+      </div>
+
+      {/* Findings: Permanent height-stable layout */}
+      <div className="results-container">
+        {/* 3 Metric Stats */}
+        <div className="metrics-row">
+          <div className="stat-box">
+            <span className="stat-label">Confidence</span>
+            <span className={`stat-number ${result ? 'accent' : 'dimmed'}`}>
+              {result ? `${result.confidence}%` : '—'}
+            </span>
+          </div>
+          <div className="stat-box">
+            <span className="stat-label">Total Lesions</span>
+            <span className={`stat-number ${result ? '' : 'dimmed'}`}>
+              {result ? result.total_lesion : '—'}
+            </span>
+          </div>
+          <div className="stat-box">
+            <span className="stat-label">Severity</span>
+            <span
+              className={`stat-number text-val ${result ? '' : 'dimmed'}`}
+              title={result ? severityText : undefined}
+            >
+              {severityText}
+            </span>
+          </div>
+        </div>
+
+        {/* Spatial Breakdown Table */}
+        <div className="breakdown-section">
+          <div className="breakdown-header-row">
+            <span className="breakdown-title">Lesion Distribution</span>
+            {!result && !isAnalyzing && (
+              <span className="standby-tag">Awaiting Analysis</span>
+            )}
+            {isAnalyzing && (
+              <span className="standby-tag processing">Analyzing...</span>
+            )}
+          </div>
+          <div className="table-scroll">
+            <table className="clean-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Count</th>
+                  <th>Area</th>
+                  <th>Max (μm)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lesions.map((item) => (
+                  <tr key={item.type}>
+                    <td>
+                      <div className="type-cell">
+                        <span
+                          className="color-dot"
+                          style={item.color ? { backgroundColor: item.color } : { border: '1.5px solid #ccc' }}
+                        />
+                        <span>{item.type}</span>
+                      </div>
+                    </td>
+                    <td className="bold">{item.count}</td>
+                    <td className="muted">{item.area_percentage}</td>
+                    <td>{item.largest_spot}</td>
+                    <td>
+                      <span className={`status-pill ${item.status ? item.status.toLowerCase() : 'pending'}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

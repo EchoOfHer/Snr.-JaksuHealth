@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import Navbar from './components/Navbar'
-import SampleGallery from './components/SampleGallery'
 import InputImagePanel from './components/InputImagePanel'
 import ClinicalInfoPanel from './components/ClinicalInfoPanel'
+import SampleGallery from './components/SampleGallery'
 import AnalysisPanel from './components/AnalysisPanel'
 import { SAMPLES, parseFilename } from './services/sampleData'
-import { analyzeImageMock /* swap to analyzeImage when Backend is ready */ } from './services/api'
+import { analyzeImageWithFallback } from './services/api'
 import './App.css'
 
 function App() {
-  const [selectedSample, setSelectedSample] = useState(null)
-  const [isAnalyzing, setIsAnalyzing]       = useState(false)
-  const [result, setResult]                 = useState(null)
+  const [selectedSample, setSelectedSample] = useState(SAMPLES[0])
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [result, setResult] = useState(null)
 
   const handleSelectSample = (sample) => {
     setSelectedSample(sample)
-    setResult(null) // clear old result when selecting new image
+    setResult(null)
   }
 
   const handleAnalyze = async () => {
@@ -23,7 +23,7 @@ function App() {
     setIsAnalyzing(true)
     setResult(null)
     try {
-      const data = await analyzeImageMock(selectedSample.id, selectedSample.img)
+      const data = await analyzeImageWithFallback(selectedSample.id, selectedSample.img)
       setResult(data)
     } catch (err) {
       console.error('Analysis error:', err)
@@ -35,64 +35,71 @@ function App() {
   const metadata = selectedSample ? parseFilename(selectedSample.id) : null
 
   return (
-    <div className="app">
+    <div className="apple-app">
       <Navbar />
 
-      <div className="page-header">
-        <h1 className="page-title">Retinal Image Analysis</h1>
-        <p className="page-subtitle">
-          Analyze fundus photographs for lesion distribution and structural density
-        </p>
-      </div>
+      <main className="content-container">
+        {/* Title */}
+        <header className="page-intro">
+          <h1 className="main-title">Retinal Image Analysis</h1>
+          <p className="main-subtitle">Automated fundus screening based on Beckman Clinical Classification</p>
+        </header>
 
-      <div className="main-content">
-        {/* ── LEFT COLUMN CARDS ── */}
-        <div className="left-column">
-          <InputImagePanel sample={selectedSample} />
+        {/* Dual Workstation: 2 Elegant Cards */}
+        <div className="dual-grid">
+          {/* ── LEFT: SOURCE WORKSTATION ── */}
+          <section className="apple-card left-card">
+            <div className="card-top">
+              <span className="card-title">Source Image</span>
+            </div>
 
-          <SampleGallery
-            samples={SAMPLES}
-            selected={selectedSample}
-            onSelect={handleSelectSample}
-          />
+            <InputImagePanel sample={selectedSample} />
 
-          <ClinicalInfoPanel metadata={metadata} />
-        </div>
+            <ClinicalInfoPanel metadata={metadata} />
 
-        {/* ── RIGHT COLUMN CARDS ── */}
-        <div className="right-column">
-          <AnalysisPanel
-            result={result}
-            isAnalyzing={isAnalyzing}
-            sample={selectedSample}
-          />
-        </div>
+            <SampleGallery
+              samples={SAMPLES}
+              selected={selectedSample}
+              onSelect={handleSelectSample}
+            />
 
-        {/* ── LEFT ACTION BUTTON ── */}
-        <div className="left-action">
-          <button
-            type="button"
-            className="action-btn analyze-btn"
-            onClick={handleAnalyze}
-            disabled={!selectedSample || isAnalyzing}
-          >
-            {isAnalyzing ? 'Analyzing...' : 'Analyze image'}
-          </button>
-        </div>
-
-        {/* ── RIGHT ACTION BUTTON ── */}
-        <div className="right-action">
-          {result && (
             <button
               type="button"
-              className="action-btn download-btn"
-              onClick={() => alert('PDF export will be available once the Backend is connected.')}
+              className="apple-button primary"
+              onClick={handleAnalyze}
+              disabled={!selectedSample || isAnalyzing}
+            >
+              {isAnalyzing ? 'Analyzing...' : 'Analyze Image'}
+            </button>
+          </section>
+
+          {/* ── RIGHT: DIAGNOSTIC FINDINGS ── */}
+          <section className="apple-card right-card">
+            <div className="card-top">
+              <span className="card-title">Analysis</span>
+            </div>
+
+            <AnalysisPanel
+              result={result}
+              isAnalyzing={isAnalyzing}
+              sample={selectedSample}
+            />
+
+            <button
+              type="button"
+              className="apple-button secondary"
+              onClick={() => {
+                if (result) {
+                  alert('PDF export will be available once backend is connected.')
+                }
+              }}
+              disabled={!result || isAnalyzing}
             >
               Download PDF Report
             </button>
-          )}
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

@@ -21,5 +21,7 @@ export function parseFilename(id) {
     patientId,
     visitCode,
     eye: eyeCode === 'L' ? 'Left Eye (OS)' : 'Right Eye (OD)',
+    eyeSide: eyeCode === 'L' ? 'Left Eye' : 'Right Eye',
+    eyeCode: eyeCode === 'L' ? 'OS' : 'OD',
   }
 }

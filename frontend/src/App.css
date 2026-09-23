@@ -1,850 +1,860 @@
-/* ===========================
-   NAVBAR — Floating White Pill
-=========================== */
-.navbar {
-  position: fixed;
-  top: 10px;
-  left: 24px;
-  right: 24px;
-  z-index: 999;
-  background-color: #ffffff;
-  border-radius: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 28px;
-  height: 64px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+/* ==========================================================================
+   JAKSUHEALTH — APPLE DESIGN SYSTEM (MINIMAL, CLEAN, INTUITIVE)
+   ========================================================================== */
+
+:root {
+  --apple-bg: #f5f5f7;
+  --apple-card: #ffffff;
+  --apple-text: #1d1d1f;
+  --apple-secondary: #86868b;
+  --apple-border: rgba(0, 0, 0, 0.06);
+  --apple-canvas: #000000;
+  
+  --primary: #fe7743;
+  --primary-hover: #e86330;
+  
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 980px;
+  
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.07);
+  
+  --font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif;
 }
 
-/* When scrolling down: expand to full width and flat edges */
-.navbar.sticky-nav {
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--apple-bg);
+  color: var(--apple-text);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
+
+/* ===========================
+   1. APPLE GLASS NAVBAR
+=========================== */
+.apple-navbar {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  border-radius: 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.09);
-}
-
-.navbar-left {
+  z-index: 999;
+  height: 68px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--apple-border);
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex: 1;
 }
 
-.navbar-logo {
-  flex-shrink: 0;
+.navbar-inner {
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 0 36px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
 .navbar-brand {
   display: flex;
-  align-items: baseline;
-  gap: 1px;
-  font-size: 20px;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-logo-img {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+
+.brand-text {
+  font-size: 21px;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.3px;
+  color: var(--apple-text);
+  letter-spacing: -0.4px;
 }
 
-.brand-jaksu {
-  color: #1c1c1e;
-}
-
-.brand-health {
+.brand-accent {
   color: var(--primary);
 }
 
 .navbar-time {
-  flex: 1;
-  text-align: right;
-  color: var(--text-dark);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  opacity: 0.75;
-}
-
-/* ===========================
-   PAGE HEADER
-=========================== */
-.page-header {
-  padding: 16px 24px 14px;
-}
-
-.page-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--text-dark);
-  opacity: 0.85;
-  letter-spacing: -0.3px;
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: var(--text-soft);
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-/* ===========================
-   MAIN LAYOUT
-=========================== */
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg);
-  padding-top: 88px;
-}
-
-.main-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  grid-template-rows: auto auto;
-  gap: 16px 20px;
-  padding: 0 24px 32px;
-  flex: 1;
-}
-
-.left-column {
-  grid-column: 1;
-  grid-row: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  height: 100%;
-}
-
-.right-column {
-  grid-column: 2;
-  grid-row: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.left-action {
-  grid-column: 1;
-  grid-row: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 4px;
-}
-
-.right-action {
-  grid-column: 2;
-  grid-row: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 4px;
-}
-
-/* ===========================
-   CARDS
-=========================== */
-.card {
-  background: var(--card-bg);
-  border-radius: var(--radius-md);
-  padding: 18px 22px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  box-shadow: var(--shadow-card);
-}
-
-.card-header {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  color: var(--text-dark);
-  opacity: 0.75;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-}
-
-/* ===========================
-   SAMPLE GALLERY CAROUSEL
-=========================== */
-.sample-gallery-card {
-  overflow: hidden;
-  position: relative;
-  user-select: none;
-}
-
-.gallery-carousel-wrapper {
-  position: relative;
-  width: 100%;
-  height: 112px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 6px 0 2px;
-}
-
-.gallery-carousel-track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.gallery-card-item {
-  position: absolute;
-  width: 68px;
-  height: 68px;
-  cursor: pointer;
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-              opacity 0.4s ease,
-              filter 0.4s ease;
-  transform: translateX(calc(var(--pos) * 76px))
-             scale(calc(1 - var(--dist) * 0.18));
-  z-index: calc(10 - var(--dist));
-  opacity: calc(1 - var(--dist) * 0.32);
-}
-
-.gallery-card-item.center-active {
-  transform: translateX(0) scale(1.24);
-  z-index: 20;
-  opacity: 1;
-}
-
-.gallery-item-thumb {
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #0a0a0c;
-  border: 2px solid transparent;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-}
-
-.gallery-item-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.gallery-card-item.center-active .gallery-item-thumb {
-  border-color: var(--primary);
-  box-shadow: 0 6px 20px rgba(254, 119, 67, 0.45);
-}
-
-.gallery-card-item:not(.center-active):hover {
-  opacity: 0.95;
-  filter: brightness(1.08);
-}
-
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 1.5px solid #e5e7eb;
-  color: var(--text-dark);
-  font-size: 20px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 30;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  padding: 0;
-  line-height: 1;
-}
-
-.carousel-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #ffffff;
-  transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 6px 16px rgba(254, 119, 67, 0.4);
-}
-
-.carousel-btn.prev-btn {
-  left: 2px;
-}
-
-.carousel-btn.next-btn {
-  right: 2px;
-}
-
-.gallery-selected-label {
-  text-align: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-soft);
-  letter-spacing: 0.04em;
-  margin-top: 4px;
-}
-
-/* ===========================
-   INPUT IMAGE PANEL
-=========================== */
-.panel-top-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 24px;
-  margin-bottom: 6px;
-}
-
-.panel-sub-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-soft);
-  height: 20px;
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.step-badge {
-  font-size: 12px;
-  color: var(--text-soft);
-  font-weight: 600;
-  background: #f3f3f3;
-  padding: 3px 10px;
-  border-radius: 50px;
-}
-
-.step-badge.step-result {
-  background: #fff0e6;
-  color: var(--primary);
-}
-
-.input-image-body {
-  width: 100%;
-}
-
-.await-zone {
-  width: 100%;
-  height: 240px;
-  border: 2px dashed #d1d5db;
-  border-radius: var(--radius-sm);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #fafafa;
-  gap: 10px;
-}
-
-.await-title {
   font-size: 15px;
   font-weight: 600;
-  color: #888888;
-}
-
-.await-subtitle {
-  font-size: 12px;
-  color: #aaaaaa;
-  text-align: center;
-  padding: 0 20px;
-  font-weight: 500;
-}
-
-.image-zone {
-  width: 100%;
-  height: 240px;
-  background: #0a0a0c;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.image-zone img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  color: var(--apple-secondary);
 }
 
 /* ===========================
-   CLINICAL INFO PANEL
+   2. APP CONTAINER & INTRO
 =========================== */
-.clinical-info-card {
-  flex: 1;
+.apple-app {
+  min-height: 100vh;
+  padding-top: 88px;
+  padding-bottom: 48px;
+}
+
+.content-container {
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 0 36px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
-.clinical-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+.page-intro {
+  padding: 4px 0 0;
 }
 
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.field-label {
-  font-size: 11px;
+.main-title {
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--text-soft);
-  text-transform: uppercase;
+  color: var(--apple-text);
+  letter-spacing: -0.5px;
 }
 
-.field-value {
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  padding: 9px 12px;
+.main-subtitle {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-dark);
-  background: #fafafa;
-  min-height: 38px;
-}
-
-.field-value.placeholder {
-  color: #bbbbbb;
+  color: var(--apple-secondary);
+  margin-top: 4px;
   font-weight: 400;
 }
 
 /* ===========================
-   ACTION BUTTONS
+   3. DUAL WORKSTATION GRID
 =========================== */
-.action-btn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  height: 48px;
-  width: 290px;
-  max-width: 100%;
-  padding: 0 24px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.1px;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  box-shadow: var(--shadow-btn);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+.dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
 }
 
-.action-btn:hover:not(:disabled) {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(254, 119, 67, 0.45);
-}
-
-.action-btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.action-btn:disabled {
-  background: #fed7aa;
-  box-shadow: none;
-  cursor: not-allowed;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-/* ===========================
-   ANALYSIS PANEL (RIGHT)
-=========================== */
-.analysis-panel {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
-}
-
-.analysis-header {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--text-dark);
-  opacity: 0.75;
-  text-transform: uppercase;
-  margin-bottom: 16px;
-  flex-shrink: 0;
-}
-
-.analysis-await {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  min-height: 420px;
-}
-
-.analysis-content {
+.apple-card {
+  background: var(--apple-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--apple-border);
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  height: 100%;
 }
 
-.result-section {
+.card-top {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.section-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-soft);
-  letter-spacing: 0.1px;
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--apple-secondary);
+  text-transform: uppercase;
 }
 
 /* ===========================
-   LOADING SPINNER
+   4. CANVASES (ORIGINAL & BIOMARKER)
 =========================== */
-.spinner {
-  width: 44px;
-  height: 44px;
-  border: 3.5px solid #e5e7eb;
+.canvas-frame {
+  width: 100%;
+  height: clamp(240px, 21vw, 306px);
+  background: var(--apple-canvas);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.retina-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.empty-canvas {
+  color: #48484a;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Minimalist Apple Spinner */
+.analyzing-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.apple-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
   border-top-color: var(--primary);
   border-radius: 50%;
-  animation: spin 0.75s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
+.analyzing-text {
+  font-size: 13px;
+  color: #8e8e93;
+  font-weight: 500;
+}
+
 /* ===========================
-   BIOMARKER IMAGE
+   5. PATIENT & CLINICAL INFO (MINIMAL MONOCHROME)
 =========================== */
-.biomarker-image {
-  width: 100%;
-  height: 240px;
-  background: #0a0a0c;
+.patient-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.patient-meta-card {
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  height: 74px;
+  box-sizing: border-box;
+}
+
+.patient-meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--apple-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.patient-meta-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--apple-text);
+  letter-spacing: -0.3px;
+}
+
+.laterality-value-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.laterality-code-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--apple-secondary);
+  background: #efeff2;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+}
+
+/* ===========================
+   6. CIRCULAR SAMPLE CAROUSEL
+=========================== */
+.circular-sample-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sample-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sample-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--apple-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sample-badge-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--apple-secondary);
+  background: #efeff2;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.carousel-view-container {
+  position: relative;
+  width: 100%;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
 
-.biomarker-image img {
+.carousel-circular-stage {
+  position: relative;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.circular-sample-item {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              opacity 0.35s ease,
+              filter 0.35s ease;
+  transform: translateX(calc(var(--offset) * 64px)) scale(calc(1 - var(--abs-offset) * 0.22));
+  z-index: calc(10 - var(--abs-offset));
+  opacity: calc(1 - var(--abs-offset) * 0.35);
+}
+
+.circular-sample-item.center-active {
+  transform: translateX(0) scale(1.22);
+  z-index: 20;
+  opacity: 1;
+}
+
+.sample-img-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.sample-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.circular-sample-item.center-active .sample-img-wrapper {
+  border-color: var(--primary);
+  box-shadow: 0 6px 18px rgba(254, 119, 67, 0.4);
+}
+
+.carousel-circle-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid var(--apple-border);
+  color: var(--apple-text);
+  font-size: 16px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 30;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.carousel-circle-nav:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.carousel-circle-nav.prev { left: 4px; }
+.carousel-circle-nav.next { right: 4px; }
+
 
 /* ===========================
-   METRICS CARDS
+   7. ANALYSIS & STATS (APPLE HEALTH STYLE)
 =========================== */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.metric-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  background: #fafafa;
-  transition: box-shadow 0.2s;
+.analysis-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 16px;
 }
 
-.metric-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn 0.35s ease;
 }
 
-.metric-name {
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat-box {
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  height: 74px;
+  box-sizing: border-box;
+}
+
+.stat-label {
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-soft);
-  margin-bottom: 4px;
-  letter-spacing: 0.05em;
+  color: var(--apple-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.metric-value {
-  font-size: 28px;
+.stat-number {
+  font-size: 24px;
   font-weight: 700;
-  line-height: 1.1;
+  color: var(--apple-text);
+  letter-spacing: -0.5px;
 }
 
-.metric-value.orange {
+.stat-number.accent {
   color: var(--primary);
 }
 
-.metric-value.dark {
-  color: var(--text-dark);
-}
-
-.metric-bar {
-  width: 100%;
-  height: 4px;
-  background: #e5e7eb;
-  border-radius: 4px;
-  margin-top: 6px;
-  overflow: hidden;
-}
-
-.metric-bar-fill {
-  height: 100%;
-  background: var(--primary);
-  border-radius: 4px;
-}
-
-.metric-tag {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-soft);
-  margin-top: 4px;
-}
-
-.metric-tag.severity {
-  color: #d97706;
-}
-
-/* ===========================
-   LESION TABLE
-=========================== */
-.lesion-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.lesion-table th {
-  text-align: left;
-  padding: 8px 10px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--text-soft);
-  text-transform: uppercase;
-  border-bottom: 1.5px solid var(--border);
-  white-space: nowrap;
-}
-
-.lesion-table td {
-  padding: 10px;
-  border-bottom: 1px solid #f3f3f3;
-  color: var(--text-dark);
+.stat-number.dimmed {
+  color: #c7c7cc;
   font-weight: 500;
 }
 
-.lesion-table tr:last-child td {
-  border-bottom: none;
+.stat-number.text-val {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
 }
 
-.td-number {
-  font-weight: 600;
-  color: var(--text-dark);
-}
-
-.td-muted {
-  color: var(--text-soft);
-}
-
-.lesion-type-cell {
+/* Breakdown Table */
+.breakdown-section {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
 }
 
-.lesion-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
+.breakdown-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.standby-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--apple-secondary);
+  background: #efeff2;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.standby-tag.processing {
+  color: var(--primary);
+  background: rgba(254, 119, 67, 0.12);
+}
+
+.breakdown-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--apple-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.clean-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.clean-table th {
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--apple-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.clean-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  color: var(--apple-text);
+  font-weight: 500;
+  font-size: 12.5px;
+}
+
+.clean-table tr:last-child td {
+  border-bottom: none;
+}
+
+.type-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
-.lesion-dot.empty {
-  border: 1.5px solid #aaaaaa;
-  background: transparent;
+.bold {
+  font-weight: 700;
 }
 
-.status-badge {
-  font-size: 12px;
+.muted {
+  color: var(--apple-secondary);
+}
+
+.status-pill {
+  font-size: 11px;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
 }
 
-.status-badge.status-significant {
-  background: #f1f5f9;
-  color: #334155;
+.status-pill.significant {
+  background: #f2f2f7;
+  color: #3a3a3c;
 }
 
-.status-badge.status-moderate {
-  background: #fffbeb;
-  color: #b45309;
+.status-pill.moderate {
+  background: #fff8e6;
+  color: #b25e00;
 }
 
-.table-responsive-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.status-pill.pending {
+  background: #f2f2f7;
+  color: #8e8e93;
+  font-weight: 500;
 }
 
 /* ===========================
-   RESPONSIVE DESIGN (TABLET & MOBILE)
+   8. APPLE PILL BUTTONS
 =========================== */
-@media (max-width: 960px) {
-  .main-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 0 16px 32px;
+.apple-button {
+  height: 42px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  max-width: 90%;
+  padding: 0 32px;
+  align-self: center;
+  margin-top: auto;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  letter-spacing: -0.01em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.apple-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.apple-button.primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.apple-button.primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(254, 119, 67, 0.3);
+}
+
+.apple-button.primary:disabled {
+  background: #f2a685;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.apple-button.secondary {
+  background: #1d1d1f;
+  color: #ffffff;
+}
+
+.apple-button.secondary:hover:not(:disabled) {
+  background: #333336;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.apple-button.secondary:disabled {
+  background: #f2f2f7;
+  color: #aeaeb2;
+  cursor: not-allowed;
+  box-shadow: none;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* ===========================
+   9. RESPONSIVE BREAKPOINTS
+=========================== */
+
+/* Laptop & Medium Screens (≤ 1200px) */
+@media (max-width: 1200px) {
+  .content-container {
+    padding: 0 24px;
   }
 
-  /* Logical Mobile Flow: Input Stack -> Analyze Button -> Analysis Results -> Download Button */
-  .left-column {
-    order: 1;
-    width: 100%;
+  .navbar-inner {
+    padding: 0 24px;
   }
 
-  .left-action {
-    order: 2;
-    width: 100%;
-    margin-bottom: 8px;
+  .dual-grid {
+    gap: 18px;
   }
 
-  .right-column {
-    order: 3;
-    width: 100%;
+  .apple-card {
+    padding: 20px;
+    gap: 14px;
   }
 
-  .right-action {
-    order: 4;
-    width: 100%;
-  }
-
-  .action-btn {
-    width: 100%;
-    max-width: 380px;
-    height: 48px;
+  .canvas-frame {
+    height: clamp(230px, 24vw, 290px);
   }
 }
 
+/* Tablets & Vertical Viewports (≤ 960px) */
+@media (max-width: 960px) {
+  .apple-app {
+    padding-top: 80px;
+    padding-bottom: 40px;
+  }
+
+  .content-container {
+    padding: 0 20px;
+    gap: 16px;
+  }
+
+  .navbar-inner {
+    padding: 0 20px;
+  }
+
+  .dual-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .apple-card {
+    padding: 22px;
+  }
+
+  .canvas-frame {
+    height: clamp(240px, 38vw, 340px);
+  }
+
+  .apple-button {
+    width: 320px;
+    max-width: 100%;
+  }
+}
+
+/* Mobile Screens (≤ 640px) */
 @media (max-width: 640px) {
-  /* Mobile Navbar */
-  .navbar {
-    top: 6px;
-    left: 10px;
-    right: 10px;
-    height: 52px;
+  .apple-app {
+    padding-top: 72px;
+    padding-bottom: 28px;
+  }
+
+  .apple-navbar {
+    height: 58px;
+  }
+
+  .navbar-inner {
     padding: 0 16px;
-    border-radius: 26px;
   }
 
-  .navbar-brand {
+  .navbar-logo-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-text {
     font-size: 18px;
-  }
-
-  .navbar-logo img {
-    width: 30px;
-    height: 30px;
   }
 
   .navbar-time {
-    font-size: 12px;
+    font-size: 13px;
   }
 
-  .app {
-    padding-top: 72px;
+  .content-container {
+    padding: 0 14px;
+    gap: 14px;
   }
 
-  /* Mobile Header */
-  .page-header {
-    padding: 10px 14px 10px;
+  .main-title {
+    font-size: 22px;
+    letter-spacing: -0.3px;
   }
 
-  .page-title {
-    font-size: 21px;
+  .main-subtitle {
+    font-size: 12.5px;
   }
 
-  .page-subtitle {
-    font-size: 12px;
+  .dual-grid {
+    gap: 14px;
   }
 
-  /* Main Container & Cards */
-  .main-content {
-    padding: 0 10px 24px;
-    gap: 12px;
+  .apple-card {
+    padding: 16px;
+    border-radius: 16px;
+    gap: 14px;
   }
 
-  .card {
-    padding: 14px 12px;
-    border-radius: 14px;
+  .canvas-frame {
+    height: 220px;
+    border-radius: 12px;
   }
 
-  /* Mobile Carousel */
-  .gallery-carousel-wrapper {
-    height: 96px;
+  .patient-meta-grid {
+    gap: 8px;
   }
 
-  .gallery-card-item {
-    width: 58px;
-    height: 58px;
-    transform: translateX(calc(var(--pos) * 62px))
-               scale(calc(1 - var(--dist) * 0.16));
+  .patient-meta-card {
+    padding: 10px 12px;
+    height: 66px;
   }
 
-  .gallery-card-item.center-active {
-    transform: translateX(0) scale(1.22);
-  }
-
-  .carousel-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 18px;
-  }
-
-  /* Mobile Image Containers */
-  .await-zone,
-  .image-zone,
-  .biomarker-image {
-    height: 200px;
-  }
-
-  /* Clinical Info inputs on small screens */
-  .clinical-fields {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  /* Metrics 3-column layout on small screens */
-  .metrics-grid {
-    gap: 6px;
-  }
-
-  .metric-card {
-    padding: 10px 8px;
-  }
-
-  .metric-value {
-    font-size: 20px;
-  }
-
-  .metric-name {
+  .patient-meta-label {
     font-size: 10px;
   }
 
-  /* Full-width tap targets for mobile */
-  .action-btn {
+  .patient-meta-value {
+    font-size: 15px;
+  }
+
+  .laterality-code-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+
+  .metrics-row {
+    gap: 6px;
+  }
+
+  .stat-box {
+    padding: 8px 8px;
+    height: 66px;
+  }
+
+  .stat-label {
+    font-size: 9.5px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+
+  .clean-table th {
+    padding: 5px 6px;
+    font-size: 9px;
+  }
+
+  .clean-table td {
+    padding: 6px 6px;
+    font-size: 11px;
+  }
+
+  .status-pill {
+    font-size: 9.5px;
+    padding: 1px 5px;
+  }
+
+  .carousel-view-container {
+    height: 76px;
+  }
+
+  .circular-sample-item {
+    width: 48px;
+    height: 48px;
+    transform: translateX(calc(var(--offset) * 48px)) scale(calc(1 - var(--abs-offset) * 0.22));
+  }
+
+  .circular-sample-item.center-active {
+    transform: translateX(0) scale(1.18);
+  }
+
+  .carousel-circle-nav {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .apple-button {
+    width: 100%;
     max-width: 100%;
+    height: 40px;
+    font-size: 13.5px;
   }
 }
