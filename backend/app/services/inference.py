@@ -8,8 +8,9 @@ import torchvision.transforms as transforms
 
 # ------------------------------------------------------------
 # การตั้งค่า (Configuration)
-# ------------------------------------------------------------
-MODEL_WEIGHTS_PATH = r"D:\Backup\Senior-Project\Jaksu-Demo\backend\model\SegFormer_best_model.pth"
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+MODEL_WEIGHTS_PATH = os.path.join(BASE_DIR, 'model', 'SegFormer_best_model.pth')
 NUM_CLASSES = 5
 IMAGE_SIZE = (512, 512)
 
