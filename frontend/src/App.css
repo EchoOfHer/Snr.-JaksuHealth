@@ -64,7 +64,7 @@ button {
 
 .navbar-inner {
   width: 100%;
-  max-width: 1560px;
+  max-width: 95%;
   margin: 0 auto;
   padding: 0 36px;
   display: flex;
@@ -112,7 +112,7 @@ button {
 
 .content-container {
   width: 100%;
-  max-width: 1560px;
+  max-width: 95%;
   margin: 0 auto;
   padding: 0 36px;
   display: flex;
@@ -179,7 +179,8 @@ button {
 =========================== */
 .canvas-frame {
   width: 100%;
-  height: clamp(240px, 21vw, 306px);
+  aspect-ratio: 16 / 10;
+  max-height: 480px;
   background: var(--apple-canvas);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -680,9 +681,7 @@ button {
     gap: 14px;
   }
 
-  .canvas-frame {
-    height: clamp(230px, 24vw, 290px);
-  }
+
 }
 
 /* Tablets & Vertical Viewports (≤ 960px) */
@@ -710,9 +709,7 @@ button {
     padding: 22px;
   }
 
-  .canvas-frame {
-    height: clamp(240px, 38vw, 340px);
-  }
+
 
   .apple-button {
     width: 320px;
@@ -772,10 +769,7 @@ button {
     gap: 14px;
   }
 
-  .canvas-frame {
-    height: 220px;
-    border-radius: 12px;
-  }
+  .canvas-frame { border-radius: 12px; }
 
   .patient-meta-grid {
     gap: 8px;
