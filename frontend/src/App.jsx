@@ -84,9 +84,25 @@ function App() {
     if (!selectedSample || isAnalyzing) return
     setIsAnalyzing(true)
     setResult(null)
+    
     try {
-      const data = await analyzeImageWithFallback(selectedSample.id, selectedSample.img)
-      setResult(data)
+      // แปลงภาพตัวอย่าง (Sample) จาก URL ให้เป็นก้อน File เพื่อส่งไปให้ Backend
+      const response = await fetch(selectedSample.img)
+      const blob = await response.blob()
+      const fileToUpload = new File([blob], `${selectedSample.id}.png`, { type: 'image/png' })
+
+      // นำเข้า analyzeImageFile มาจาก api.js เพื่อยิงหา Backend ตัวจริง
+      const { analyzeImageFile, analyzeImageMock } = await import('./services/api')
+      
+      try {
+        const data = await analyzeImageFile(fileToUpload)
+        setResult(data)
+      } catch (backendErr) {
+        console.info('[JaksuHealth] Backend failed, falling back to mock.', backendErr)
+        const fallbackData = await analyzeImageMock(selectedSample.id, selectedSample.img)
+        setResult(fallbackData)
+      }
+
     } catch (err) {
       console.error('Analysis error:', err)
     } finally {
@@ -164,9 +180,11 @@ function App() {
         <ReportTemplate
           patientId={metadata?.patientId || 'N/A'}
           eyeLaterality={metadata?.eye || 'N/A'}
-          findings={result?.findings || { Drusen: 1500, Exudates: 820, Hemorrhages: 340 }}
+          lesions={result?.lesions || []}
+          severity={result?.severity || '—'}
+          confidence={result?.confidence || '—'}
           imageBase64={selectedSample?.img || ''}
-          maskBase64={result?.mask_base64 || ''}
+          maskBase64={result?.biomarker_image || ''}
         />
       </div>
     </div>

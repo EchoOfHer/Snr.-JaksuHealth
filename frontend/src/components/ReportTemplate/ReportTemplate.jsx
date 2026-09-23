@@ -10,21 +10,14 @@ const LESION_COLORS = {
   Drusen:       '#00FFFF',
 };
 
-const ReportTemplate = ({ patientId, eyeLaterality, findings, imageBase64, maskBase64 }) => {
+const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, confidence, imageBase64, maskBase64 }) => {
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB');
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-  // TODO: คำนวณ Total Lesion (ตอนนี้นับจากจำนวนคลาสที่เจอ)
-  const totalLesionTypes = Object.keys(findings).length;
-
-  // TODO: คำนวณ Severity Level จากจำนวนรอยโรคหรือพิกเซลรวม
-  // Logic: กำหนดเกณฑ์เอง เช่น 1 คลาส = Mild, 2-3 = Intermediate, 4+ = Severe
-  const severityLevel = 'Intermediate';
-
-  // TODO: คำนวณ Confidence (ถ้า Backend ยังไม่ส่งมา ใส่ Mock ไว้ก่อน)
-  const confidence = 94;
+  // Calculate Total Lesions directly from lesions array
+  const totalLesionCount = lesions?.reduce((acc, l) => acc + (l.count || 0), 0) || 0;
 
   return (
     <div id="pdf-report-content" className="report-container">
@@ -88,11 +81,11 @@ const ReportTemplate = ({ patientId, eyeLaterality, findings, imageBase64, maskB
           </div>
           <div className="metric-item">
             <span className="metric-label">Total lesion</span>
-            <span className="metric-value">{totalLesionTypes}</span>
+            <span className="metric-value">{totalLesionCount}</span>
           </div>
           <div className="metric-item">
             <span className="metric-label">Severity Level</span>
-            <span className="metric-value-text">{severityLevel}</span>
+            <span className="metric-value-text">{severity}</span>
           </div>
         </div>
 
@@ -108,23 +101,27 @@ const ReportTemplate = ({ patientId, eyeLaterality, findings, imageBase64, maskB
             </tr>
           </thead>
           <tbody>
-            {Object.entries(findings).map(([diseaseName, pixelCount], index) => (
-              <tr key={index}>
-                <td className="disease-cell">
-                  <span
-                    className="color-box"
-                    style={{ backgroundColor: LESION_COLORS[diseaseName] || '#999' }}
-                  ></span>
-                  {diseaseName}
-                </td>
-                <td>{pixelCount}</td>
-                {/* TODO: คำนวณ Area Percentage = (pixelCount / totalPixels) * 100 */}
-                <td>-</td>
-                {/* TODO: คำนวณ Max (mm) ขนาดจุดที่ใหญ่ที่สุด */}
-                <td>-</td>
-                <td>{pixelCount > 1000 ? 'Significant' : 'Moderate'}</td>
+            {lesions && lesions.length > 0 ? (
+              lesions.map((lesion, index) => (
+                <tr key={index}>
+                  <td className="disease-cell">
+                    <span
+                      className="color-box"
+                      style={{ backgroundColor: lesion.color || LESION_COLORS[lesion.type] || '#999' }}
+                    ></span>
+                    {lesion.type}
+                  </td>
+                  <td>{lesion.count}</td>
+                  <td>{lesion.area_percentage}</td>
+                  <td>{lesion.max_mm}</td>
+                  <td>{lesion.status}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center' }}>No lesions found</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

@@ -90,7 +90,7 @@ async def predict_lesion(file: UploadFile = File(...)):
     
     try:
         # สั่งรันโมเดล AI (ใส่ try-except เผื่อเกิด Error ระหว่างคิด เช่น แรมการ์ดจอเต็ม)
-        mask = predictor.predict(image_rgb)
+        mask, global_confidence = predictor.predict(image_rgb)
         
         # วาด Overlay 5 คลาส
         CLASS_INFO = {
@@ -105,15 +105,64 @@ async def predict_lesion(file: UploadFile = File(...)):
         overlay_layer = Image.new("RGBA", img_rgba.size, (0, 0, 0, 0))
         findings = {}
 
+        # ---------------------------------------------------------
+        # 4. Compute lesion statistics (count, area %, max size in mm)
+        # ---------------------------------------------------------
+        import math
+        from scipy.ndimage import label
+        
+        # Calculate SRF using OpticDisc (class 0)
+        od_mask = mask[0]
+        od_pixels = int(od_mask.sum())
+        
+        if od_pixels > 0:
+            # Dpx = equivalent diameter of Optic Disc in pixels
+            Dpx = math.sqrt(4 * od_pixels / math.pi)
+            # SRF (mm per pixel) = 1800 micrometer (1.8 mm) / Dpx
+            mm_per_pixel = 1.8 / Dpx
+            mm_conversion_approximate = False
+        else:
+            # Fallback to DPI if OD is not detected
+            dpi_info = image.info.get('dpi') or (96, 96)
+            dpi = dpi_info[0] if isinstance(dpi_info, (list, tuple)) else dpi_info
+            mm_per_pixel = 25.4 / dpi if dpi else 0.0
+            mm_conversion_approximate = True
+
+        total_pixels = mask.shape[1] * mask.shape[2]
+        lesions = []
+
+        for class_idx, info in CLASS_INFO.items():
+            sample_mask = mask[class_idx]
+            pixel_sum = int(sample_mask.sum())
+            # Connected component labeling for distinct lesions
+            labeled, n_features = label(sample_mask)
+            count = int(n_features)
+            # Area percentage
+            area_percentage = (pixel_sum / total_pixels * 100) if total_pixels else 0.0
+            # Largest component size (pixels) and equivalent diameter
+            if n_features > 0:
+                component_sizes = np.bincount(labeled.ravel())[1:]  # exclude background
+                largest_px = int(component_sizes.max())
+                equiv_diameter_px = math.sqrt(4 * largest_px / math.pi)
+                max_mm = round(equiv_diameter_px * mm_per_pixel, 2)
+            else:
+                max_mm = 0.0
+            lesions.append({
+                "type": info["name"],
+                "color": f"#{info['color'][0]:02X}{info['color'][1]:02X}{info['color'][2]:02X}",
+                "count": count,
+                "area_percentage": round(area_percentage, 2),
+                "max_mm": max_mm,
+            })
+            if pixel_sum > 0:
+                findings[info["name"]] = pixel_sum
+
+        # Create overlay image as before
         for class_idx, info in CLASS_INFO.items():
             sample_mask = mask[class_idx]
             if sample_mask.sum() > 0:
-                findings[info['name']] = int(sample_mask.sum())
                 mask_img = Image.fromarray((sample_mask * 255).astype(np.uint8), mode='L')
-                
-                # Apply Gaussian Blur to smooth the edges
                 mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
-                
                 color_layer = Image.new("RGBA", img_rgba.size, info["color"])
                 disease_layer = Image.composite(color_layer, Image.new("RGBA", img_rgba.size, (0, 0, 0, 0)), mask_img)
                 overlay_layer = Image.alpha_composite(overlay_layer, disease_layer)
@@ -128,6 +177,9 @@ async def predict_lesion(file: UploadFile = File(...)):
         return {
             "status": "success",
             "findings": findings,
+            "lesions": lesions,
+            "confidence": global_confidence,
+            "mm_conversion_approximate": mm_conversion_approximate,
             "metadata": metadata,
             "mask_base64": base64_string
         }

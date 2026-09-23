@@ -106,8 +106,24 @@ class SegformerPredictor:
             
             # บีบมิติ Batch ทิ้ง จะได้ Array เปล่าๆ รูปทรง (5, Height, Width)
             mask_array = prediction.squeeze().cpu().numpy()
+            probs_array = probs.squeeze().cpu().numpy()
             
-        return mask_array
+            # คำนวณ Global Confidence (เฉพาะรอยโรค: 2=Exudates, 3=Hemorrhages, 4=Drusen)
+            disease_classes = [2, 3, 4]
+            probs_disease = probs_array[disease_classes, :, :]
+            mask_disease = mask_array[disease_classes, :, :]
+            
+            if mask_disease.sum() > 0:
+                # ถ้าเจอโรค: ค่าเฉลี่ยความมั่นใจของพิกเซลที่ถูกทายว่าเป็นโรค
+                confidence = float(probs_disease[mask_disease == 1].mean()) * 100
+            else:
+                # ถ้าไม่เจอโรคเลย: ค่าเฉลี่ยความมั่นใจว่า "ไม่มีโรค" (1 - probability)
+                confidence = float((1 - probs_disease).mean()) * 100
+            
+            # ปัดเศษให้เป็นจำนวนเต็มสวยๆ
+            global_confidence = round(confidence)
+            
+        return mask_array, global_confidence
 
 # ------------------------------------------------------------
 # ส่วนสำหรับการรันทดสอบโมเดล (Testing script)
@@ -136,10 +152,10 @@ if __name__ == "__main__":
     pred_time = time.time()
     
     # 2. สั่งทำนาย! (ใส่รูปดิบเข้าไปได้เลย เพราะโมเดลจะไปโคลนทำ CLAHE เองข้างใน)
-    mask = predictor.predict(img)   
+    mask, confidence = predictor.predict(img)   
     
     print(f'Inference completed in {time.time() - pred_time:.2f} seconds')
-    print(f'Mask shape: {mask.shape}') # ควรเป็น (5, 512, 512)
+    print(f'Mask shape: {mask.shape} | Global Confidence: {confidence}%')
 
     # 3. นำผลลัพธ์มาแปะทับลงบน "รูปดิบ" (Overlay) แบบ 5 คลาส (Opacity 75%)
     # กำหนดสีและชื่อให้แต่ละคลาส (ค่าสี RGBA: A=191 คือ Opacity 75%)

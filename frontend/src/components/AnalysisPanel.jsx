@@ -1,7 +1,7 @@
 const DEFAULT_LESIONS = [
-  { type: 'Drusen', color: '#9333ea' },
-  { type: 'Hard Exudate', color: '#8e8e93' },
-  { type: 'Hemorrhages', color: '#0071e3' },
+  { type: 'Drusen', color: '#00FFFF' },
+  { type: 'Hard Exudate', color: '#FFFF00' },
+  { type: 'Hemorrhages', color: '#FF0000' },
 ]
 
 function formatSeverity(val) {
@@ -34,7 +34,7 @@ export default function AnalysisPanel({ result, isAnalyzing, sample }) {
     color: l.color,
     count: '—',
     area_percentage: '—',
-    largest_spot: '—',
+    max_mm: '—',
     status: 'Pending',
   }))
 
@@ -53,7 +53,7 @@ export default function AnalysisPanel({ result, isAnalyzing, sample }) {
           </div>
         ) : result ? (
           <img
-            src={result.biomarker_image ?? sample?.img}
+            src={result?.biomarker_image ? `data:image/png;base64,${result.biomarker_image}` : sample?.img}
             alt="Biomarker"
             className="retina-image"
           />
@@ -109,7 +109,7 @@ export default function AnalysisPanel({ result, isAnalyzing, sample }) {
                   <th>Type</th>
                   <th>Count</th>
                   <th>Area</th>
-                  <th>Max (μm)</th>
+                  <th>Max (mm)</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -127,7 +127,11 @@ export default function AnalysisPanel({ result, isAnalyzing, sample }) {
                     </td>
                     <td className="bold">{item.count}</td>
                     <td className="muted">{item.area_percentage}</td>
-                    <td>{item.largest_spot}</td>
+                    <td>
+                      {item.max_mm !== undefined && item.max_mm !== '—' 
+                        ? (result?.mm_conversion_approximate ? `≈${item.max_mm}` : item.max_mm)
+                        : '—'}
+                    </td>
                     <td>
                       <span className={`status-pill ${item.status ? item.status.toLowerCase() : 'pending'}`}>
                         {item.status}

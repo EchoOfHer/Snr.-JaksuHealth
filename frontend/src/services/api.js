@@ -51,45 +51,132 @@ export async function analyzeImageMock(sampleId, imageUrl) {
     lesions: [
       {
         type: 'Drusen',
-        color: '#9B59B6',
+        color: '#00FFFF',
         count: selected.total_lesion > 0 ? Math.round(selected.total_lesion * 0.55) : 0,
-        area_percentage: selected.total_lesion > 0 ? '1.48 of total' : '0.00',
-        largest_spot: selected.total_lesion > 0 ? 150 : 0,
-        status: selected.total_lesion > 30 ? 'Significant' : selected.total_lesion > 0 ? 'Moderate' : 'None',
+        area_percentage: selected.total_lesion > 0 ? '1.48%' : '0.00%',
+        max_mm: selected.total_lesion > 0 ? 1.5 : 0,
+        status: selected.total_lesion > 0 ? 'Intermediate' : 'None',
       },
       {
         type: 'Hard Exudate',
-        color: null,
+        color: '#FFFF00',
         count: selected.total_lesion > 0 ? Math.round(selected.total_lesion * 0.32) : 0,
-        area_percentage: selected.total_lesion > 0 ? '1.25 of total' : '0.00',
-        largest_spot: selected.total_lesion > 0 ? 80 : 0,
-        status: selected.total_lesion > 30 ? 'Significant' : selected.total_lesion > 0 ? 'Moderate' : 'None',
+        area_percentage: selected.total_lesion > 0 ? '1.25%' : '0.00%',
+        max_mm: selected.total_lesion > 0 ? 0.8 : 0,
+        status: selected.total_lesion > 0 ? 'Late (Neovascular)' : 'None',
       },
       {
         type: 'Hemorrhages',
-        color: '#3B82F6',
+        color: '#FF0000',
         count: selected.total_lesion > 0 ? Math.round(selected.total_lesion * 0.13) : 0,
-        area_percentage: selected.total_lesion > 0 ? '0.80 of total' : '0.00',
-        largest_spot: selected.total_lesion > 0 ? 50 : 0,
-        status: selected.total_lesion > 10 ? 'Significant' : selected.total_lesion > 0 ? 'Moderate' : 'None',
+        area_percentage: selected.total_lesion > 0 ? '0.80%' : '0.00%',
+        max_mm: selected.total_lesion > 0 ? 0.5 : 0,
+        status: selected.total_lesion > 0 ? 'Late (Neovascular)' : 'None',
       },
-    ],
+    ].sort((a, b) => b.count - a.count),
   }
 }
 
 /**
  * analyzeImageFile — For when user uploads a custom raw fundus file
  */
+// --- Beckman Classification Logic ---
+function classify_AMD_beckman(eye_features) {
+  if (eye_features.has_geographic_atrophy || eye_features.has_neovascular_amd) {
+    if (eye_features.has_neovascular_amd && eye_features.has_geographic_atrophy) {
+      return "Late AMD (Neovascular + Geographic Atrophy)";
+    } else if (eye_features.has_neovascular_amd) {
+      return "Late AMD (Neovascular AMD)";
+    } else {
+      return "Late AMD (Geographic Atrophy)";
+    }
+  }
+
+  const d = eye_features.max_drusen_diameter_um;
+  const pigment = eye_features.has_pigmentary_abnormality;
+
+  if (!d || d === 0) {
+    if (pigment) return "Indeterminate — pigment abnormality without drusen, review needed";
+    return "No apparent aging changes";
+  } else if (d <= 63) {
+    if (pigment) return "Indeterminate — pigment abnormality with drupelets only, review needed";
+    return "Normal aging changes";
+  } else if (d > 63 && d <= 125) {
+    if (pigment) return "Intermediate AMD";
+    return "Early AMD";
+  } else {
+    return "Intermediate AMD";
+  }
+}
+
 export async function analyzeImageFile(file) {
   const formData = new FormData()
   formData.append('file', file)
 
-  const res = await fetch(`${BASE_URL}/predict`, {
+  const res = await fetch(`${BASE_URL}/api/predict`, {
     method: 'POST',
     body: formData,
   })
   if (!res.ok) throw new Error(`Image file analysis failed: ${res.status}`)
-  return await res.json()
+  
+  const rawData = await res.json()
+  
+  // Extract features for overall severity
+  const drusenLesion = rawData.lesions?.find(l => l.type === 'Drusen');
+  const max_drusen_diameter_um = drusenLesion && drusenLesion.count > 0 ? (drusenLesion.max_mm * 1000) : 0;
+  
+  const has_neovascular_amd = rawData.lesions?.some(l => 
+    (l.type === 'Hemorrhages' || l.type === 'Exudates') && l.count > 0
+  ) || false;
+
+  const severity = classify_AMD_beckman({
+    max_drusen_diameter_um,
+    has_pigmentary_abnormality: false, // Not detected by model
+    has_geographic_atrophy: false,     // Not detected by model
+    has_neovascular_amd
+  });
+
+  // แปลงข้อมูลจาก Backend ให้เข้ากับหน้าตา UI (AnalysisPanel)
+  const lesions = rawData.lesions
+    ?.filter(l => l.type !== 'OpticDisc' && l.type !== 'Macula')
+    ?.map(l => {
+      const displayType = l.type === 'Exudates' ? 'Hard Exudate' : l.type;
+
+      // Status อิงจากผลกระทบต่อ Beckman Score
+      let status = 'None';
+      if (l.type === 'Drusen') {
+        const d_um = l.max_mm * 1000;
+        if (l.count > 0) {
+          status = d_um > 125 ? 'Intermediate' : d_um > 63 ? 'Early' : 'Normal';
+        }
+      } else if (l.type === 'Hemorrhages' || l.type === 'Exudates') {
+        status = l.count > 0 ? 'Late (Neovascular)' : 'None';
+      }
+
+      return {
+        type: displayType,
+        color: l.color,
+        count: l.count,
+        area_percentage: `${l.area_percentage}%`,
+        max_mm: l.max_mm,
+        status: status,
+      };
+    })
+    ?.sort((a, b) => b.count - a.count) || [];
+
+  // คำนวณ total แบบใหม่ (รวมจำนวนก้อนทั้งหมด)
+  const total = lesions.reduce((acc, curr) => acc + curr.count, 0);
+
+  return {
+    biomarker_image: rawData.mask_base64,
+    confidence: rawData.confidence ?? 94,
+    total_lesion: total,
+    severity: severity,
+    lesions: lesions,
+    mm_conversion_approximate: rawData.mm_conversion_approximate,
+    original_findings: rawData.findings,
+    metadata: rawData.metadata
+  }
 }
 
 /**
@@ -97,7 +184,7 @@ export async function analyzeImageFile(file) {
  */
 export async function checkHealth() {
   try {
-    const res = await fetch(`${BASE_URL}/health`, { method: 'GET' })
+    const res = await fetch(`${BASE_URL}/api/status`, { method: 'GET' })
     return res.ok
   } catch {
     return false
