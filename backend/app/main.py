@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import router as predict_router
+from api.endpoints import router as predict_router
 
 app = FastAPI(title="JaksuHealth AI API")
 
