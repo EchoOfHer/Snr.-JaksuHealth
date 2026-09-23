@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from PIL import Image
+from PIL import Image, UnidentifiedImageError, ImageFilter
 import numpy as np
 import cv2  # นำเข้า OpenCV สำหรับทำ CLAHE
 from transformers import SegformerConfig, SegformerForSemanticSegmentation
@@ -121,24 +121,24 @@ if __name__ == "__main__":
     try: 
         img = Image.open(test_img_path).convert('RGB')
     except FileNotFoundError:
-        print(f"❌ หารูปภาพไม่เจอที่: {test_img_path}")
+        print(f"❌ Image not found at: {test_img_path}")
         exit()
         
-    print('กำลังโหลดโมเดลเข้าการ์ดจอ...')
+    print('Loading model into device...')
     start_time = time.time()
 
     # สร้างตัวทำนาย (Predictor)
     predictor = SegformerPredictor(MODEL_WEIGHTS_PATH)
 
-    print(f'โหลดเสร็จใน {time.time()-start_time:.2f} วินาที | ทำงานบน: {predictor.device.upper()}')
-    print(f'กำลังสแกนหารอยโรค...')
+    print(f'Loaded in {time.time()-start_time:.2f} seconds | Device: {predictor.device.upper()}')
+    print(f'Scanning for lesions...')
     
     pred_time = time.time()
     
     # 2. สั่งทำนาย! (ใส่รูปดิบเข้าไปได้เลย เพราะโมเดลจะไปโคลนทำ CLAHE เองข้างใน)
     mask = predictor.predict(img)   
     
-    print(f'ทำนายเสร็จแล้วใน {time.time() - pred_time:.2f} วินาที')
+    print(f'Inference completed in {time.time() - pred_time:.2f} seconds')
     print(f'Mask shape: {mask.shape}') # ควรเป็น (5, 512, 512)
 
     # 3. นำผลลัพธ์มาแปะทับลงบน "รูปดิบ" (Overlay) แบบ 5 คลาส (Opacity 75%)
@@ -160,12 +160,16 @@ if __name__ == "__main__":
         sample_mask = mask[class_idx]
         
         if sample_mask.sum() == 0:
-            print(f"✅ ไม่พบ {info['name']}")
+            print(f"✅ Not found: {info['name']}")
         else:
-            print(f"🚨 พบ {info['name']}! จำนวน {sample_mask.sum()} พิกเซล")
+            print(f"🚨 Detected: {info['name']}! Count: {sample_mask.sum()} pixels")
             
             # สร้างหน้ากาก (Mask) เฉพาะจุดที่ทายเจอ
             mask_img = Image.fromarray((sample_mask * 255).astype(np.uint8), mode='L')
+            
+            # ลูบขอบหน้ากากให้เนียนด้วย Gaussian Blur 
+            from PIL import ImageFilter
+            mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
             
             # สร้างแผ่นกระดาษสีตามคลาส ขนาดเท่ารูปภาพต้นฉบับ
             color_layer = Image.new("RGBA", img_rgba.size, info["color"])
@@ -182,4 +186,4 @@ if __name__ == "__main__":
     # บันทึกรูปผสม
     blended_image.save("test_output_overlay.png")
     
-    print(f"\n🖼️ เซฟรูปผสมเสร็จแล้ว! เปิดดูไฟล์ 'test_output_overlay.png' ได้เลยครับ")
+    print(f"\n🖼️ Blended image saved successfully! Please check 'test_output_overlay.png'")

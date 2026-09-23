@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, UnidentifiedImageError, ImageFilter
 import io
 import base64
 import numpy as np
@@ -110,6 +110,10 @@ async def predict_lesion(file: UploadFile = File(...)):
             if sample_mask.sum() > 0:
                 findings[info['name']] = int(sample_mask.sum())
                 mask_img = Image.fromarray((sample_mask * 255).astype(np.uint8), mode='L')
+                
+                # Apply Gaussian Blur to smooth the edges
+                mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
+                
                 color_layer = Image.new("RGBA", img_rgba.size, info["color"])
                 disease_layer = Image.composite(color_layer, Image.new("RGBA", img_rgba.size, (0, 0, 0, 0)), mask_img)
                 overlay_layer = Image.alpha_composite(overlay_layer, disease_layer)
