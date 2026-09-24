@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 export default function SampleGallery({ samples, selected, onSelect }) {
   const count = samples.length
   const half = Math.floor(count / 2)
@@ -7,15 +9,43 @@ export default function SampleGallery({ samples, selected, onSelect }) {
     : 0
 
   const handlePrev = (e) => {
-    e.stopPropagation()
+    if (e) e.stopPropagation()
     const nextIdx = (currentIndex - 1 + count) % count
     onSelect(samples[nextIdx])
   }
 
   const handleNext = (e) => {
-    e.stopPropagation()
+    if (e) e.stopPropagation()
     const nextIdx = (currentIndex + 1) % count
     onSelect(samples[nextIdx])
+  }
+
+  // --- SWIPE SUPPORT ---
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+
+  const minSwipeDistance = 40
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches ? e.targetTouches[0].clientX : e.clientX)
+  }
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches ? e.targetTouches[0].clientX : e.clientX)
+  }
+
+  const onTouchEndEvent = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      handleNext()
+    } else if (isRightSwipe) {
+      handlePrev()
+    }
   }
 
   return (
@@ -25,7 +55,21 @@ export default function SampleGallery({ samples, selected, onSelect }) {
         <span className="sample-badge-count">{currentIndex + 1} of {count}</span>
       </div>
 
-      <div className="carousel-view-container">
+      <div 
+        className="carousel-view-container"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEndEvent}
+        onMouseDown={onTouchStart}
+        onMouseMove={(e) => touchStart && onTouchMove(e)}
+        onMouseUp={onTouchEndEvent}
+        onMouseLeave={() => {
+          if (touchStart) {
+            onTouchEndEvent()
+            setTouchStart(null)
+          }
+        }}
+      >
         {/* Prev Arrow */}
         <button
           type="button"
