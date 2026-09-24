@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 import Navbar from './components/Navbar'
@@ -15,7 +15,27 @@ function App() {
   const [selectedSample, setSelectedSample] = useState(SAMPLES[0])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [result, setResult] = useState(null)
+  const [isServerOnline, setIsServerOnline] = useState(null)
   const reportRef = useRef(null)
+
+  useEffect(() => {
+    let mounted = true
+    const verifyHealth = async () => {
+      try {
+        const { checkHealth } = await import('./services/api')
+        const online = await checkHealth()
+        if (mounted) setIsServerOnline(online)
+      } catch (err) {
+        if (mounted) setIsServerOnline(false)
+      }
+    }
+    verifyHealth()
+    const interval = setInterval(verifyHealth, 10000)
+    return () => {
+      mounted = false
+      clearInterval(interval)
+    }
+  }, [])
 
   // ฟังก์ชันสำหรับดาวน์โหลด PDF (ใช้ jsPDF + html2canvas ตรงๆ เพื่อบังคับ 1 หน้า)
   const handleDownloadPDF = async () => {
@@ -161,6 +181,7 @@ function App() {
               result={result}
               isAnalyzing={isAnalyzing}
               sample={selectedSample}
+              isServerOnline={isServerOnline}
             />
 
             <button

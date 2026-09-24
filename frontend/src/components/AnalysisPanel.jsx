@@ -28,7 +28,7 @@ function formatSeverity(val) {
   return String(val)
 }
 
-export default function AnalysisPanel({ result, isAnalyzing, sample }) {
+export default function AnalysisPanel({ result, isAnalyzing, sample, isServerOnline }) {
   const lesions = result?.lesions ?? DEFAULT_LESIONS.map((l) => ({
     type: l.type,
     color: l.color,
@@ -59,7 +59,13 @@ export default function AnalysisPanel({ result, isAnalyzing, sample }) {
           />
         ) : (
           <div className="empty-canvas">
-            <span>Ready for analysis</span>
+            {isServerOnline === false ? (
+              <span style={{ color: '#ff3b30' }}>Server Offline (Simulation Mode)</span>
+            ) : isServerOnline === null ? (
+              <span>Connecting to Server...</span>
+            ) : (
+              <span>Ready for analysis</span>
+            )}
           </div>
         )}
       </div>
