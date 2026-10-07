@@ -29,7 +29,7 @@ function formatSeverity(val) {
 }
 
 export default function AnalysisPanel({ result, isAnalyzing, sample, isServerOnline }) {
-  const lesions = result?.lesions ?? DEFAULT_LESIONS.map((l) => ({
+  const rawLesions = result?.lesions ?? DEFAULT_LESIONS.map((l) => ({
     type: l.type,
     color: l.color,
     count: '—',
@@ -37,6 +37,11 @@ export default function AnalysisPanel({ result, isAnalyzing, sample, isServerOnl
     max_mm: '—',
     status: 'Pending',
   }))
+
+  // Filter out anatomical non-lesion features (OpticDisc, Macula)
+  const lesions = rawLesions.filter(
+    (l) => !['OpticDisc', 'Macula', 'Optic Disc'].includes(l.type)
+  )
 
   const severityText = result
     ? formatSeverity(result.severity ?? result.severity_level)
@@ -75,7 +80,7 @@ export default function AnalysisPanel({ result, isAnalyzing, sample, isServerOnl
         {/* 3 Metric Stats */}
         <div className="metrics-row">
           <div className="stat-box">
-            <span className="stat-label">Confidence</span>
+            <span className="stat-label">Confidence *</span>
             <span className={`stat-number ${result ? 'accent' : 'dimmed'}`}>
               {result ? `${result.confidence}%` : '—'}
             </span>
@@ -95,6 +100,10 @@ export default function AnalysisPanel({ result, isAnalyzing, sample, isServerOnl
               {severityText}
             </span>
           </div>
+        </div>
+        
+        <div className="confidence-footnote">
+          * Confidence score is calculated by averaging the AI model's pixel-wise probabilities for all detected lesions. If normal, it averages the confidence of being healthy.
         </div>
 
         {/* Spatial Breakdown Table */}

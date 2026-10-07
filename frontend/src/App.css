@@ -317,11 +317,11 @@ button {
 .carousel-view-container {
   position: relative;
   width: 100%;
-  height: 90px;
+  min-height: 110px; /* Unlocked/increased height to prevent clipping */
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  /* Removed overflow: hidden so scaled elements/shadows don't get cut off */
 }
 
 .carousel-circular-stage {
@@ -335,13 +335,13 @@ button {
 
 .circular-sample-item {
   position: absolute;
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
   cursor: pointer;
   transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
               opacity 0.35s ease,
               filter 0.35s ease;
-  transform: translateX(calc(var(--offset) * 64px)) scale(calc(1 - var(--abs-offset) * 0.22));
+  transform: translateX(calc(var(--offset) * 68px)) scale(calc(1 - var(--abs-offset) * 0.22));
   z-index: calc(10 - var(--abs-offset));
   /* Make inactive items slightly dimmer */
   opacity: calc(0.65 - var(--abs-offset) * 0.2);
@@ -358,16 +358,17 @@ button {
 .sample-img-wrapper {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   background: #000;
-  border: 3px solid transparent;
+  padding: 5px; /* Creates the black padding/frame */
   transition: all 0.3s ease;
 }
 
 .sample-img-wrapper img {
   width: 100%;
   height: 100%;
+  border-radius: 8px; /* Inner image rounded corners */
   object-fit: cover;
   display: block;
 }
@@ -451,7 +452,7 @@ button {
 }
 
 .stat-label {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--apple-secondary);
   text-transform: uppercase;
@@ -459,7 +460,7 @@ button {
 }
 
 .stat-number {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 700;
   color: var(--apple-text);
   letter-spacing: -0.5px;
@@ -475,13 +476,23 @@ button {
 }
 
 .stat-number.text-val {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.25;
+}
+
+.confidence-footnote {
+  font-size: 11px;
+  color: #8e8e93;
+  margin-top: -12px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  text-align: center;
+  padding: 0 12px;
 }
 
 /* Breakdown Table */
@@ -527,13 +538,13 @@ button {
 .clean-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px;
   text-align: left;
 }
 
 .clean-table th {
-  padding: 6px 10px;
-  font-size: 10px;
+  padding: 8px 10px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--apple-secondary);
   text-transform: uppercase;
@@ -542,11 +553,11 @@ button {
 }
 
 .clean-table td {
-  padding: 7px 10px;
+  padding: 8px 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   color: var(--apple-text);
   font-weight: 500;
-  font-size: 12.5px;
+  font-size: 14px;
 }
 
 .clean-table tr:last-child td {
@@ -803,36 +814,40 @@ button {
   }
 
   .stat-label {
-    font-size: 9.5px;
+    font-size: 11px;
   }
 
   .stat-number {
-    font-size: 18px;
+    font-size: 22px;
+  }
+  
+  .stat-number.text-val {
+    font-size: 16px;
   }
 
   .clean-table th {
-    padding: 5px 6px;
-    font-size: 9px;
-  }
-
-  .clean-table td {
     padding: 6px 6px;
     font-size: 11px;
   }
 
+  .clean-table td {
+    padding: 6px 6px;
+    font-size: 12px;
+  }
+
   .status-pill {
-    font-size: 9.5px;
-    padding: 1px 5px;
+    font-size: 10px;
+    padding: 2px 6px;
   }
 
   .carousel-view-container {
-    height: 76px;
+    min-height: 90px;
   }
 
   .circular-sample-item {
     width: 48px;
     height: 48px;
-    transform: translateX(calc(var(--offset) * 48px)) scale(calc(1 - var(--abs-offset) * 0.22));
+    transform: translateX(calc(var(--offset) * 54px)) scale(calc(1 - var(--abs-offset) * 0.22));
   }
 
   .circular-sample-item.center-active {
