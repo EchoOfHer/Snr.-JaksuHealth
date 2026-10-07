@@ -161,8 +161,8 @@ if __name__ == "__main__":
     # 3. นำผลลัพธ์มาแปะทับลงบน "รูปดิบ" (Overlay) แบบ 5 คลาส (Opacity 75%)
     # กำหนดสีและชื่อให้แต่ละคลาส (ค่าสี RGBA: A=191 คือ Opacity 75%)
     CLASS_INFO = {
-        0: {"name": "OpticDisc", "color": (0, 0, 255, 191)},      # น้ำเงิน
-        1: {"name": "Macula", "color": (0, 255, 0, 191)},         # เขียว
+        0: {"name": "OpticDisc", "color": (0, 0, 255, 0)},      # น้ำเงิน
+        1: {"name": "Macula", "color": (0, 255, 0, 0)},         # เขียว
         2: {"name": "Exudates", "color": (255, 255, 0, 191)},     # เหลือง
         3: {"name": "Hemorrhages", "color": (255, 0, 0, 191)},    # แดง
         4: {"name": "Drusen", "color": (0, 255, 255, 191)},       # ฟ้า
