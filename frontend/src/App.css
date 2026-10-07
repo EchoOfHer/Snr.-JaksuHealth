@@ -275,7 +275,7 @@ button {
 .canvas-frame {
   width: 100%;
   aspect-ratio: 16 / 7.2;
-  max-height: 346px;
+  max-height: none; /* Let width: 100% dictate the size */
   flex-shrink: 0;
   background: var(--apple-canvas);
   border-radius: var(--radius-md);
