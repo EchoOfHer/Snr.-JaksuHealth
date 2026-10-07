@@ -96,8 +96,8 @@ async def predict_lesion(file: UploadFile = File(...)):
         CLASS_INFO = {
             0: {"name": "OpticDisc", "color": (0, 0, 255, 0)},
             1: {"name": "Macula", "color": (0, 255, 0, 0)},
-            2: {"name": "Exudates", "color": (255, 255, 0, 191)},
-            3: {"name": "Hemorrhages", "color": (255, 0, 0, 191)},
+            2: {"name": "Exudates", "color": (0, 255, 0, 191)},
+            3: {"name": "Hemorrhages", "color": (154, 205, 50, 191)},
             4: {"name": "Drusen", "color": (0, 255, 255, 191)},
         }
 
