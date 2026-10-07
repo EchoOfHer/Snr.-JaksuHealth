@@ -103,7 +103,7 @@ export default function AnalysisPanel({ result, isAnalyzing, sample, isServerOnl
         </div>
         
         <div className="confidence-footnote">
-          * Confidence score is calculated by averaging the AI model's pixel-wise probabilities for all detected lesions. If normal, it averages the confidence of being healthy.
+          * Confidence averages the AI model's pixel-wise probabilities across detected lesions, or healthy tissue for normal results.
         </div>
 
         {/* Spatial Breakdown Table */}
