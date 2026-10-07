@@ -63,7 +63,7 @@ export default function SampleGallery({ samples, selected, onSelect }) {
             marginRight: '8px',
             fontWeight: '600'
           }}>
-            {selected.category}
+            {selected.category} | GT: {selected.gt} {selected.errors && selected.errors !== 'None' ? `| Err: ${selected.errors}` : ''}
           </span>
         )}
         <span className="sample-badge-count">{currentIndex + 1} of {count}</span>
