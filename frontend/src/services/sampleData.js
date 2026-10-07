@@ -1,16 +1,16 @@
 export const SAMPLES = [
-  { id: 'HH35224_0400_R', img: '/samples/HH35224_0400_R.png', category: 'Hallucination', gt: '11010', errors: 'Drusens:FP' },
-  { id: 'HH35305_0400_R', img: '/samples/HH35305_0400_R.png', category: 'Wrong', gt: '11011', errors: 'Macula:FN, Drusens:FN' },
-  { id: 'HH36548_0400_R', img: '/samples/HH36548_0400_R.png', category: 'Near Miss', gt: '11101', errors: 'Exudates:FN' },
-  { id: 'HH36895_0100_R', img: '/samples/HH36895_0100_R.png', category: 'Correct', gt: '11111', errors: 'None' },
-  { id: 'HH39462_0400_R', img: '/samples/HH39462_0400_R.png', category: 'Near Miss', gt: '11010', errors: 'Hemorrhages:FN' },
-  { id: 'HH40146_0200_L', img: '/samples/HH40146_0200_L.png', category: 'Near Miss', gt: '11110', errors: 'Exudates:FN' },
-  { id: 'HH40481_0200_L', img: '/samples/HH40481_0200_L.png', category: 'Correct', gt: '11000', errors: 'None' },
-  { id: 'HH41169_0400_R', img: '/samples/HH41169_0400_R.png', category: 'Wrong', gt: '11010', errors: 'Macula:FN, Exudates:FP' },
-  { id: 'HH43038_0100_R', img: '/samples/HH43038_0100_R.png', category: 'Wrong', gt: '11110', errors: 'Exudates:FN, Hemorrhages:FN, Drusens:FP' },
-  { id: 'HH47166_0200_L', img: '/samples/HH47166_0200_L.png', category: 'Hallucination', gt: '11000', errors: 'Hemorrhages:FP, Drusens:FP' },
-  { id: 'HH60751_0200_L', img: '/samples/HH60751_0200_L.png', category: 'Hallucination', gt: '11000', errors: 'Drusens:FP' },
-  { id: 'HH61365_0200_L', img: '/samples/HH61365_0200_L.png', category: 'Correct', gt: '11000', errors: 'None' },
+  { id: 'HH35224_0400_R', img: '/samples/HH35224_0400_R.png', tagLabel: 'FP-DR | GT : 11010' },
+  { id: 'HH35305_0400_R', img: '/samples/HH35305_0400_R.png', tagLabel: 'FN-MA, FN-DR | GT : 11011' },
+  { id: 'HH36548_0400_R', img: '/samples/HH36548_0400_R.png', tagLabel: 'FN-EX | GT : 11101' },
+  { id: 'HH36895_0100_R', img: '/samples/HH36895_0100_R.png', tagLabel: 'GT : 11111' },
+  { id: 'HH39462_0400_R', img: '/samples/HH39462_0400_R.png', tagLabel: 'FN-HE | GT : 11010' },
+  { id: 'HH40146_0200_L', img: '/samples/HH40146_0200_L.png', tagLabel: 'FN-EX | GT : 11110' },
+  { id: 'HH40481_0200_L', img: '/samples/HH40481_0200_L.png', tagLabel: 'GT : 11000' },
+  { id: 'HH41169_0400_R', img: '/samples/HH41169_0400_R.png', tagLabel: 'FN-MA, FP-EX | GT : 11010' },
+  { id: 'HH43038_0100_R', img: '/samples/HH43038_0100_R.png', tagLabel: 'FN-EX, FN-HE, FP-DR | GT : 11110' },
+  { id: 'HH47166_0200_L', img: '/samples/HH47166_0200_L.png', tagLabel: 'FP-HE, FP-DR | GT : 11000' },
+  { id: 'HH60751_0200_L', img: '/samples/HH60751_0200_L.png', tagLabel: 'FP-DR | GT : 11000' },
+  { id: 'HH61365_0200_L', img: '/samples/HH61365_0200_L.png', tagLabel: 'GT : 11000' },
 ]
 
 /**

@@ -52,7 +52,7 @@ export default function SampleGallery({ samples, selected, onSelect }) {
     <div className="circular-sample-section">
       <div className="sample-section-header">
         <span className="sample-section-title">Samples</span>
-        {selected?.category && (
+        {selected?.tagLabel && (
           <span style={{ 
             fontSize: '11px', 
             color: 'var(--apple-blue)', 
@@ -63,7 +63,7 @@ export default function SampleGallery({ samples, selected, onSelect }) {
             marginRight: '8px',
             fontWeight: '600'
           }}>
-            {selected.category} | GT: {selected.gt} {selected.errors && selected.errors !== 'None' ? `| Err: ${selected.errors}` : ''}
+            {selected.tagLabel}
           </span>
         )}
         <span className="sample-badge-count">{currentIndex + 1} of {count}</span>
