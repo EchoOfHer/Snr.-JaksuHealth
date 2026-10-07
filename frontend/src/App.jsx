@@ -146,6 +146,7 @@ function App() {
         {/* Dual Workstation: 2 Elegant Cards */}
         <div className="dual-grid">
           {/* ── LEFT: SOURCE WORKSTATION ── */}
+          <div className="source-column">
           <section className="apple-card left-card">
             <div className="card-top">
               <span className="card-title">Source Image</span>
@@ -170,6 +171,25 @@ function App() {
               {isAnalyzing ? 'Analyzing...' : 'Analyze Image'}
             </button>
           </section>
+
+          <aside className="usage-guide" aria-labelledby="usage-guide-title">
+            <h2 id="usage-guide-title">How to use</h2>
+            <ol className="usage-steps">
+              <li>
+                <strong>Select image</strong>
+                <p>Choose from Samples.</p>
+              </li>
+              <li>
+                <strong>Analyze image</strong>
+                <p>Run and review the analysis.</p>
+              </li>
+              <li>
+                <strong>Download report</strong>
+                <p>Save results as a PDF.</p>
+              </li>
+            </ol>
+          </aside>
+          </div>
 
           {/* ── RIGHT: DIAGNOSTIC FINDINGS ── */}
           <section className="apple-card right-card">
