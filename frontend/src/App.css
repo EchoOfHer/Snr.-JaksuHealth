@@ -3,6 +3,20 @@
    ========================================================================== */
 
 :root {
+  /* Typography Scale */
+  --text-display: 30px;
+  --text-h1: 28px;
+  --text-h2: 20px;
+  --text-h3: 16px;
+  --text-body: 14px;
+  --text-caption: 12px;
+  --text-micro: 11px;
+
+  /* Line Height */
+  --leading-tight: 1.2;
+  --leading-normal: 1.4;
+  --leading-relaxed: 1.5;
+
   --apple-bg: #f5f5f7;
   --apple-card: #ffffff;
   --apple-text: #1d1d1f;
@@ -85,7 +99,7 @@ button {
 }
 
 .brand-text {
-  font-size: 21px;
+  font-size: var(--text-h2);
   font-weight: 700;
   color: var(--apple-text);
   letter-spacing: -0.4px;
@@ -96,9 +110,10 @@ button {
 }
 
 .navbar-time {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--text-body);
   color: var(--apple-secondary);
+  font-weight: 400;
+    line-height: var(--leading-normal);
 }
 
 /* ===========================
@@ -125,17 +140,19 @@ button {
 }
 
 .main-title {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: var(--text-h1);
   color: var(--apple-text);
   letter-spacing: -0.5px;
+  font-weight: 600;
+    line-height: var(--leading-tight);
 }
 
 .main-subtitle {
-  font-size: 14px;
+  font-size: var(--text-caption);
   color: var(--apple-secondary);
   margin-top: 4px;
   font-weight: 400;
+    line-height: var(--leading-relaxed);
 }
 
 /* ===========================
@@ -161,7 +178,7 @@ button {
 
 .usage-guide h2 {
   margin: 0 0 16px;
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 600;
   color: var(--apple-text);
 }
@@ -200,7 +217,7 @@ button {
 }
 
 .usage-steps strong {
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: 1.5;
   font-weight: 600;
   color: var(--apple-text);
@@ -209,12 +226,22 @@ button {
 .usage-steps p {
   margin: 4px 0 0;
   grid-column: 2;
-  font-size: 12px;
+  font-size: var(--text-caption);
   line-height: 1.5;
   color: var(--apple-secondary);
 }
 
 @media (max-width: 640px) {
+  :root {
+    --text-display: 22px;
+    --text-h1: 22px;
+    --text-h2: 18px;
+    --text-h3: 15px;
+    --text-body: 14px;
+    --text-caption: 12px;
+    --text-micro: 10px;
+  }
+
   .usage-guide {
     padding: 0 16px 8px;
   }
@@ -246,6 +273,8 @@ button {
 .left-card .circular-sample-section,
 .left-card .apple-button {
   margin-top: 0;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .patient-meta-card,
@@ -262,11 +291,11 @@ button {
 }
 
 .card-title {
-  font-size: 14px;
-  font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--apple-secondary);
   text-transform: uppercase;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 /* ===========================
@@ -295,7 +324,6 @@ button {
 
 .empty-canvas {
   color: #48484a;
-  font-size: 13px;
   font-weight: 500;
 }
 
@@ -321,7 +349,6 @@ button {
 }
 
 .analyzing-text {
-  font-size: 13px;
   color: #8e8e93;
   font-weight: 500;
 }
@@ -349,18 +376,18 @@ button {
 }
 
 .patient-meta-label {
-  font-size: 11px;
-  font-weight: 600;
   color: var(--apple-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .patient-meta-value {
-  font-size: 18px;
-  font-weight: 700;
   color: var(--apple-text);
   letter-spacing: -0.3px;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .laterality-value-row {
@@ -370,12 +397,12 @@ button {
 }
 
 .laterality-code-badge {
-  font-size: 11px;
-  font-weight: 600;
   color: var(--apple-secondary);
   background: #efeff2;
   padding: 2px 7px;
   border-radius: var(--radius-pill);
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 /* ===========================
@@ -394,7 +421,6 @@ button {
 }
 
 .sample-section-title {
-  font-size: 11px;
   font-weight: 700;
   color: var(--apple-secondary);
   text-transform: uppercase;
@@ -402,7 +428,6 @@ button {
 }
 
 .sample-badge-count {
-  font-size: 11px;
   font-weight: 600;
   color: var(--apple-secondary);
   background: #efeff2;
@@ -481,7 +506,6 @@ button {
   background: #ffffff;
   border: 1px solid var(--apple-border);
   color: var(--apple-text);
-  font-size: 18px;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -548,18 +572,18 @@ button {
 }
 
 .stat-label {
-  font-size: 14px;
-  font-weight: 600;
   color: var(--apple-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .stat-number {
-  font-size: 30px;
-  font-weight: 700;
   color: var(--apple-text);
   letter-spacing: -0.5px;
+  font-weight: 700;
+    line-height: var(--leading-tight);
 }
 
 .stat-number.accent {
@@ -572,23 +596,22 @@ button {
 }
 
 .stat-number.text-val {
-  font-size: 20px;
-  font-weight: 700;
   letter-spacing: -0.3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.25;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .confidence-footnote {
-  font-size: 11px;
   color: #8e8e93;
   margin-top: -12px;
   margin-bottom: 8px;
-  line-height: 1.4;
   text-align: left;
   padding: 0;
+  font-weight: 400;
+    line-height: var(--leading-relaxed);
 }
 
 /* Breakdown Table */
@@ -607,7 +630,6 @@ button {
 }
 
 .standby-tag {
-  font-size: 11px;
   font-weight: 600;
   color: var(--apple-secondary);
   background: #efeff2;
@@ -622,10 +644,10 @@ button {
 }
 
 .breakdown-title {
-  font-size: 16px;
-  font-weight: 700;
   color: var(--apple-text);
   letter-spacing: -0.02em;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .table-scroll {
@@ -638,13 +660,11 @@ button {
 .clean-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 16px;
   text-align: left;
 }
 
 .clean-table th {
   padding: 13px 14px;
-  font-size: 15px;
   font-weight: 700;
   color: var(--apple-secondary);
   background: #f7f7fa;
@@ -657,7 +677,6 @@ button {
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   color: var(--apple-text);
   font-weight: 500;
-  font-size: 16px;
   line-height: 1.5;
   font-variant-numeric: tabular-nums;
 }
@@ -701,11 +720,11 @@ button {
 .status-pill {
   display: inline-flex;
   align-items: center;
-  font-size: 14px;
-  font-weight: 600;
   padding: 4px 9px;
   border-radius: var(--radius-pill);
   white-space: nowrap;
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .status-pill.significant {
@@ -730,8 +749,6 @@ button {
 .apple-button {
   height: 42px;
   border-radius: var(--radius-pill);
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -744,6 +761,8 @@ button {
   transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   letter-spacing: -0.01em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+    line-height: var(--leading-normal);
 }
 
 .apple-button:active:not(:disabled) {
@@ -840,11 +859,23 @@ button {
   .apple-button {
     width: 320px;
     max-width: 100%;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 }
 
 /* Mobile Screens (≤ 640px) */
 @media (max-width: 640px) {
+  :root {
+    --text-display: 22px;
+    --text-h1: 22px;
+    --text-h2: 18px;
+    --text-h3: 15px;
+    --text-body: 14px;
+    --text-caption: 12px;
+    --text-micro: 10px;
+  }
+
   .apple-app {
     padding-top: 72px;
     padding-bottom: 28px;
@@ -864,12 +895,12 @@ button {
   }
 
   .brand-text {
-    font-size: 18px;
   }
 
   .navbar-time {
-    font-size: 13px;
-  }
+  font-weight: 400;
+    line-height: var(--leading-normal);
+}
 
   .content-container {
     padding: 0 14px;
@@ -877,13 +908,15 @@ button {
   }
 
   .main-title {
-    font-size: 22px;
     letter-spacing: -0.3px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-tight);
+}
 
   .main-subtitle {
-    font-size: 12.5px;
-  }
+  font-weight: 400;
+    line-height: var(--leading-relaxed);
+}
 
   .dual-grid {
     gap: 14px;
@@ -911,17 +944,20 @@ button {
   }
 
   .patient-meta-label {
-    font-size: 10px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 
   .patient-meta-value {
-    font-size: 15px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 
   .laterality-code-badge {
-    font-size: 10px;
     padding: 1px 6px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 
   .metrics-row {
     gap: 6px;
@@ -932,31 +968,33 @@ button {
   }
 
   .stat-label {
-    font-size: 11px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 
   .stat-number {
-    font-size: 22px;
-  }
+  font-weight: 700;
+    line-height: var(--leading-tight);
+}
   
   .stat-number.text-val {
-    font-size: 16px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 
   .clean-table th {
     padding: 10px 10px;
-    font-size: 14px;
   }
 
   .clean-table td {
     padding: 12px 10px;
-    font-size: 15px;
   }
 
   .status-pill {
-    font-size: 13px;
     padding: 4px 8px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 
   .carousel-view-container {
     min-height: 90px;
@@ -975,13 +1013,13 @@ button {
   .carousel-circle-nav {
     width: 32px;
     height: 32px;
-    font-size: 16px;
   }
 
   .apple-button {
     width: 100%;
     max-width: 100%;
     height: 40px;
-    font-size: 13.5px;
-  }
+  font-weight: 600;
+    line-height: var(--leading-normal);
+}
 }

@@ -54,7 +54,7 @@ export default function SampleGallery({ samples, selected, onSelect }) {
         <span className="sample-section-title">Samples</span>
         {selected?.tagLabel && (
           <span style={{ 
-            fontSize: '11px', 
+            fontSize: 'var(--text-micro)', 
             color: 'var(--apple-blue)', 
             backgroundColor: 'rgba(0,122,255,0.1)',
             padding: '2px 8px',
