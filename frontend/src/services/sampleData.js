@@ -1,9 +1,16 @@
 export const SAMPLES = [
-  { id: 'HH36895_0100_L', img: '/samples/HH36895_0100_L.png' },
-  { id: 'HH39462_0400_L', img: '/samples/HH39462_0400_L.png' },
-  { id: 'HH40481_0200_L', img: '/samples/HH40481_0200_L.png' },
-  { id: 'HH40508_0400_R', img: '/samples/HH40508_0400_R.png' },
-  { id: 'HH47331_0200_R', img: '/samples/HH47331_0200_R.png' },
+  { id: 'HH35224_0400_R', img: '/samples/HH35224_0400_R.png', category: 'Hallucination' },
+  { id: 'HH35305_0400_R', img: '/samples/HH35305_0400_R.png', category: 'Wrong' },
+  { id: 'HH36548_0400_R', img: '/samples/HH36548_0400_R.png', category: 'Near Miss' },
+  { id: 'HH36895_0100_R', img: '/samples/HH36895_0100_R.png', category: 'Correct' },
+  { id: 'HH39462_0400_R', img: '/samples/HH39462_0400_R.png', category: 'Near Miss' },
+  { id: 'HH40146_0200_L', img: '/samples/HH40146_0200_L.png', category: 'Near Miss' },
+  { id: 'HH40481_0200_L', img: '/samples/HH40481_0200_L.png', category: 'Correct' },
+  { id: 'HH41169_0400_R', img: '/samples/HH41169_0400_R.png', category: 'Wrong' },
+  { id: 'HH43038_0100_R', img: '/samples/HH43038_0100_R.png', category: 'Wrong' },
+  { id: 'HH47166_0200_L', img: '/samples/HH47166_0200_L.png', category: 'Hallucination' },
+  { id: 'HH60751_0200_L', img: '/samples/HH60751_0200_L.png', category: 'Hallucination' },
+  { id: 'HH61365_0200_L', img: '/samples/HH61365_0200_L.png', category: 'Correct' },
 ]
 
 /**

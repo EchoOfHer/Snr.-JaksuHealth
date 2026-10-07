@@ -52,6 +52,20 @@ export default function SampleGallery({ samples, selected, onSelect }) {
     <div className="circular-sample-section">
       <div className="sample-section-header">
         <span className="sample-section-title">Samples</span>
+        {selected?.category && (
+          <span style={{ 
+            fontSize: '11px', 
+            color: 'var(--apple-blue)', 
+            backgroundColor: 'rgba(0,122,255,0.1)',
+            padding: '2px 8px',
+            borderRadius: '10px',
+            marginLeft: 'auto', 
+            marginRight: '8px',
+            fontWeight: '600'
+          }}>
+            {selected.category}
+          </span>
+        )}
         <span className="sample-badge-count">{currentIndex + 1} of {count}</span>
       </div>
 
