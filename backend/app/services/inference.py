@@ -164,8 +164,8 @@ if __name__ == "__main__":
         0: {"name": "OpticDisc", "color": (0, 0, 255, 0)},      # น้ำเงิน
         1: {"name": "Macula", "color": (0, 255, 0, 0)},         # เขียว
         2: {"name": "Exudates", "color": (0, 255, 0, 191)},     # เหลือง
-        3: {"name": "Hemorrhages", "color": (154, 205, 50, 191)},    # แดง
-        4: {"name": "Drusen", "color": (0, 255, 255, 191)},       # ฟ้า
+        3: {"name": "Hemorrhages", "color": (0, 0, 255, 191)},    # แดง
+        4: {"name": "Drusen", "color": (255, 0, 255, 191)},       # ฟ้า
     }
 
     # แปลงรูปต้นฉบับเป็น RGBA เพื่อให้รองรับแผ่นใส
