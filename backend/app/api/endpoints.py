@@ -94,11 +94,11 @@ async def predict_lesion(file: UploadFile = File(...)):
         
         # วาด Overlay 5 คลาส
         CLASS_INFO = {
-            0: {"name": "OpticDisc", "color": (0, 0, 255, 191)},
-            1: {"name": "Macula", "color": (0, 255, 0, 191)},
-            2: {"name": "Exudates", "color": (255, 255, 0, 191)},
-            3: {"name": "Hemorrhages", "color": (255, 0, 0, 191)},
-            4: {"name": "Drusen", "color": (0, 255, 255, 191)},
+            0: {"name": "OpticDisc", "color": (0, 0, 255, 0)},
+            1: {"name": "Macula", "color": (0, 255, 0, 0)},
+            2: {"name": "Exudates", "color": (0, 255, 0, 191)},
+            3: {"name": "Hemorrhages", "color": (0, 0, 255, 191)},
+            4: {"name": "Drusen", "color": (255, 0, 255, 191)},
         }
 
         img_rgba = image_rgb.convert("RGBA")
