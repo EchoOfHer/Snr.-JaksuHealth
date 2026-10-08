@@ -368,6 +368,8 @@ button {
   letter-spacing: -0.3px;
   font-weight: 600;
     line-height: var(--leading-normal);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .laterality-value-row {
@@ -423,6 +425,7 @@ button {
   align-items: center;
   justify-content: center;
   /* Removed overflow: hidden so scaled elements/shadows don't get cut off */
+  overflow-x: clip;
 }
 
 .carousel-circular-stage {

@@ -26,6 +26,8 @@
 
 html, body {
   background-color: var(--bg);
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
