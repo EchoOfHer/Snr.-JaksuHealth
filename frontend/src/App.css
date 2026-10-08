@@ -160,7 +160,7 @@ button {
 =========================== */
 .dual-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   align-items: start;
 }
@@ -234,6 +234,8 @@ button {
 
 
 .apple-card {
+  width: 100%;
+  max-width: 100%;
   background: var(--apple-card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
@@ -338,7 +340,7 @@ button {
 =========================== */
 .patient-meta-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -815,7 +817,7 @@ button {
 /* Tablets & Vertical Viewports (≤ 960px) */
 @media (max-width: 960px) {
   .usage-steps {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
   .usage-guide {
@@ -837,7 +839,7 @@ button {
   }
 
   .dual-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
 
@@ -951,7 +953,7 @@ button {
 }
 
   .metrics-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
       gap: 10px;
   }
 
