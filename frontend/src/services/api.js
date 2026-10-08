@@ -54,7 +54,7 @@ export async function analyzeImageMock(sampleId, imageUrl) {
     lesions: [
       {
         type: 'Drusen',
-        color: '#00FFFF',
+        color: '#FF00FF',
         count: selected.total_lesion > 0 ? Math.round(selected.total_lesion * 0.55) : 0,
         area_percentage: selected.total_lesion > 0 ? '1.48%' : '0.00%',
         max_mm: selected.total_lesion > 0 ? 1.5 : 0,
@@ -62,7 +62,7 @@ export async function analyzeImageMock(sampleId, imageUrl) {
       },
       {
         type: 'Hard Exudate',
-        color: '#FFFF00',
+        color: '#00FF00',
         count: selected.total_lesion > 0 ? Math.round(selected.total_lesion * 0.32) : 0,
         area_percentage: selected.total_lesion > 0 ? '1.25%' : '0.00%',
         max_mm: selected.total_lesion > 0 ? 0.8 : 0,
@@ -70,7 +70,7 @@ export async function analyzeImageMock(sampleId, imageUrl) {
       },
       {
         type: 'Hemorrhages',
-        color: '#FF0000',
+        color: '#0000FF',
         count: selected.total_lesion > 0 ? Math.round(selected.total_lesion * 0.13) : 0,
         area_percentage: selected.total_lesion > 0 ? '0.80%' : '0.00%',
         max_mm: selected.total_lesion > 0 ? 0.5 : 0,

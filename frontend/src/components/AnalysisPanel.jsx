@@ -1,7 +1,7 @@
 const DEFAULT_LESIONS = [
-  { type: 'Drusen', color: '#00FFFF' },
-  { type: 'Hard Exudate', color: '#FFFF00' },
-  { type: 'Hemorrhages', color: '#FF0000' },
+  { type: 'Drusen', color: '#FF00FF' },
+  { type: 'Hard Exudate', color: '#00FF00' },
+  { type: 'Hemorrhages', color: '#0000FF' },
 ]
 
 function formatSeverity(val) {

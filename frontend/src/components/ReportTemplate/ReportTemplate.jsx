@@ -5,9 +5,9 @@ import './ReportTemplate.css';
 const LESION_COLORS = {
   OpticDisc:    '#0000FF',
   Macula:       '#00FF00',
-  Exudates:     '#FFFF00',
-  Hemorrhages:  '#FF0000',
-  Drusen:       '#00FFFF',
+  Exudates:     '#00FF00',
+  Hemorrhages:  '#0000FF',
+  Drusen:       '#FF00FF',
 };
 
 const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, confidence, imageBase64, maskBase64 }) => {
