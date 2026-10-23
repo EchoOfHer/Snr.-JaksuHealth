@@ -238,7 +238,4 @@
 }
 
 /* ---------- 8. HIDE WRAPPER ---------- */
-.report-offscreen {
-  height: 0;
-  overflow: hidden;
-}
+.report-offscreen { position: fixed; top: 0; left: -12000px; width: 794px; height: auto; overflow: visible; pointer-events: none; }

@@ -1,6 +1,14 @@
-import { useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-export default function SampleGallery({ samples, selected, onSelect }) {
+export default function SampleGallery({ samples, selected, onSelect, disabled }) {
+  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 640px)').matches)
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 640px)')
+    const update = (event) => setCompact(event.matches)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
   const count = samples.length
   const half = Math.floor(count / 2)
 
@@ -9,78 +17,54 @@ export default function SampleGallery({ samples, selected, onSelect }) {
     : 0
 
   const handlePrev = (e) => {
+    if (disabled) return
     if (e) e.stopPropagation()
     const nextIdx = (currentIndex - 1 + count) % count
     onSelect(samples[nextIdx])
   }
 
   const handleNext = (e) => {
+    if (disabled) return
     if (e) e.stopPropagation()
     const nextIdx = (currentIndex + 1) % count
     onSelect(samples[nextIdx])
   }
 
-  // --- SWIPE SUPPORT ---
-  const [touchStart, setTouchStart] = useState(null)
-  const [touchEnd, setTouchEnd] = useState(null)
-
-  const minSwipeDistance = 40
-
-  const onTouchStart = (e) => {
-    setTouchEnd(null)
-    setTouchStart(e.targetTouches ? e.targetTouches[0].clientX : e.clientX)
+  const dragStart = useRef(null)
+  const suppressClick = useRef(false)
+  const handlePointerDown = (event) => {
+    suppressClick.current = false
+    if (disabled || (event.pointerType === 'mouse' && event.button !== 0)) return
+    dragStart.current = event.clientX
   }
-
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches ? e.targetTouches[0].clientX : e.clientX)
-  }
-
-  const onTouchEndEvent = () => {
-    if (!touchStart || !touchEnd) return
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
-
-    if (isLeftSwipe) {
-      handleNext()
-    } else if (isRightSwipe) {
-      handlePrev()
-    }
+  const handlePointerUp = (event) => {
+    if (dragStart.current === null) return
+    const distance = dragStart.current - event.clientX
+    dragStart.current = null
+    if (disabled || Math.abs(distance) < 40) return
+    suppressClick.current = true
+    if (distance > 0) handleNext()
+    else handlePrev()
   }
 
   return (
     <div className="circular-sample-section">
       <div className="sample-section-header">
         <span className="sample-section-title">Samples</span>
-        {selected?.tagLabel && (
-          <span style={{ 
-            fontSize: 'var(--text-micro)', 
-            color: 'var(--apple-blue)', 
-            backgroundColor: 'rgba(0,122,255,0.1)',
-            padding: '2px 8px',
-            borderRadius: '10px',
-            marginLeft: 'auto', 
-            marginRight: '8px',
-            fontWeight: '600'
-          }}>
-            {selected.tagLabel}
-          </span>
-        )}
         <span className="sample-badge-count">{currentIndex + 1} of {count}</span>
       </div>
 
       <div 
         className="carousel-view-container"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEndEvent}
-        onMouseDown={onTouchStart}
-        onMouseMove={(e) => touchStart && onTouchMove(e)}
-        onMouseUp={onTouchEndEvent}
-        onMouseLeave={() => {
-          if (touchStart) {
-            onTouchEndEvent()
-            setTouchStart(null)
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+        onPointerCancel={() => { dragStart.current = null }}
+        onClickCapture={(event) => {
+          if (suppressClick.current) {
+            event.preventDefault()
+            event.stopPropagation()
+            suppressClick.current = false
           }
         }}
       >
@@ -90,8 +74,9 @@ export default function SampleGallery({ samples, selected, onSelect }) {
           className="carousel-circle-nav prev"
           onClick={handlePrev}
           aria-label="Previous sample"
+          disabled={disabled}
         >
-          ‹
+          <ChevronLeft size={18} />
         </button>
 
         {/* Circular Items Stage */}
@@ -105,22 +90,27 @@ export default function SampleGallery({ samples, selected, onSelect }) {
             const isCenter = diff === 0
 
             return (
-              <div
+              <button
+                type="button"
                 key={sample.id}
                 className={`circular-sample-item ${isCenter ? 'center-active' : ''}`}
                 style={{
                   '--offset': diff,
                   '--abs-offset': Math.abs(diff),
                 }}
-                onClick={() => onSelect(sample)}
-                role="button"
-                tabIndex={0}
+                onClick={() => { if (!disabled) onSelect(sample) }}
+                disabled={disabled}
+                aria-pressed={isCenter}
+                aria-label={`Select sample ${sample.id}`}
+                aria-hidden={Math.abs(diff) > (compact ? 1 : 2)}
+                data-outside={Math.abs(diff) > 2}
+                tabIndex={Math.abs(diff) > (compact ? 1 : 2) ? -1 : 0}
                 title={sample.id}
               >
                 <div className="sample-img-wrapper">
-                  <img src={sample.img} alt={sample.id} />
+                  <img src={sample.img} alt="" draggable="false" />
                 </div>
-              </div>
+              </button>
             )
           })}
         </div>
@@ -131,8 +121,9 @@ export default function SampleGallery({ samples, selected, onSelect }) {
           className="carousel-circle-nav next"
           onClick={handleNext}
           aria-label="Next sample"
+          disabled={disabled}
         >
-          ›
+          <ChevronRight size={18} />
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import { findingsSummary, imageSource } from '../../services/evaluation';
 import './ReportTemplate.css';
 
 // สีประจำแต่ละคลาสรอยโรค (ตรงกับ Backend)
@@ -10,14 +10,11 @@ const LESION_COLORS = {
   Drusen:       '#FF00FF',
 };
 
-const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, confidence, imageBase64, maskBase64 }) => {
+const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, imageBase64, maskBase64, simulated, approximate }) => {
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB');
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-  // Calculate Total Lesions directly from lesions array
-  const totalLesionCount = lesions?.reduce((acc, l) => acc + (l.count || 0), 0) || 0;
 
   return (
     <div id="pdf-report-content" className="report-container">
@@ -61,7 +58,7 @@ const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, confidenc
           )}
           {maskBase64 && (
             <img
-              src={`data:image/png;base64,${maskBase64}`}
+              src={imageSource(maskBase64)}
               alt="AI Mask Overlay"
               className="overlay-image"
             />
@@ -73,21 +70,14 @@ const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, confidenc
       <div className="section-container">
         <h3 className="section-title">ANALYSIS METRICS</h3>
 
-        {/* Metrics Summary (3 กล่อง) */}
         <div className="metrics-summary">
           <div className="metric-item">
-            <span className="metric-label">Confidence</span>
-            <span className="metric-value highlight-orange">{confidence}%</span>
-          </div>
-          <div className="metric-item">
-            <span className="metric-label">Total lesion</span>
-            <span className="metric-value">{totalLesionCount}</span>
-          </div>
-          <div className="metric-item">
-            <span className="metric-label">Severity Level</span>
+            <span className="metric-label">Severity</span>
             <span className="metric-value-text">{severity}</span>
           </div>
         </div>
+        <p style={{ fontSize: '11px', marginBottom: '10px' }}>{findingsSummary(lesions || [])}</p>
+        {simulated && <p style={{ fontSize: '11px' }}>SIMULATION: server unavailable. Results are illustrative and status is not evaluated.</p>}
 
         {/* Lesion Detail Table */}
         <table className="analysis-table">
@@ -95,7 +85,6 @@ const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, confidenc
             <tr>
               <th>LESION TYPE</th>
               <th>COUNT</th>
-              <th>AREA PERCENTAGE</th>
               <th>MAX (MM)</th>
               <th>STATUS</th>
             </tr>
@@ -111,19 +100,20 @@ const ReportTemplate = ({ patientId, eyeLaterality, lesions, severity, confidenc
                     ></span>
                     {lesion.type}
                   </td>
-                  <td>{lesion.count}</td>
-                  <td>{lesion.area_percentage}</td>
-                  <td>{lesion.max_mm}</td>
+                  <td>{lesion.count ?? '—'}</td>
+                  <td>{lesion.count > 0 && Number.isFinite(lesion.max_mm) ? `${approximate ? '≈' : ''}${lesion.max_mm.toFixed(2)}` : '—'}</td>
                   <td>{lesion.status}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center' }}>No lesions found</td>
+                <td colSpan="4" style={{ textAlign: 'center' }}>No lesions found</td>
               </tr>
             )}
           </tbody>
         </table>
+        <p style={{ fontSize: '10px', marginTop: '8px' }}>Status compares presence per lesion type with the sample reference, not counts or sizes.</p>
+        {approximate && <p style={{ fontSize: '10px' }}>≈ Size uses the server's fallback scale.</p>}
       </div>
 
       {/* ========== 5. FOOTER ========== */}

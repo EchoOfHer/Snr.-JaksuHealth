@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://revisit-return-fog.ngrok-free.dev'
+// Empty VITE_API_URL uses Vite's /api proxy for the local backend.
+const BASE_URL = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '')
 
 /**
  * analyzeImage — Call real Backend endpoint
