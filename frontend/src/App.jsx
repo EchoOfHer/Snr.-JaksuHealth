@@ -50,6 +50,7 @@ function App() {
     setError('')
   }
 
+  // Real SegFormer Inference: fails loudly on error without mock substitution
   const handleAnalyze = async () => {
     if (!selectedSample || isAnalyzing || isExporting) return
     setIsAnalyzing(true)
@@ -58,21 +59,46 @@ function App() {
     setError('')
     try {
       const response = await fetch(selectedSample.img)
-      if (!response.ok) throw new Error('Sample image could not be loaded')
+      if (!response.ok) throw new Error('Sample image file could not be loaded from public/samples')
       const blob = await response.blob()
       const file = new File([blob], `${selectedSample.id}.png`, { type: 'image/png' })
-      let data
-      try {
-        data = await analyzeImageFile(file)
-      } catch (err) {
-        console.info('Server unavailable; showing explicitly labeled simulation:', err)
-        data = { ...await analyzeImageMock(selectedSample.id, selectedSample.img), is_simulated: true, biomarker_image: null }
-      }
-      setResult({ ...data, lesions: evaluateLesions(data.lesions ?? [], selectedSample.groundTruth, data.is_simulated) })
+
+      const data = await analyzeImageFile(file, { inputType: 'raw_fundus' })
+
+      setResult({
+        ...data,
+        is_simulated: false,
+        lesions: evaluateLesions(data.lesions ?? [], selectedSample.groundTruth, false)
+      })
       setShowOverlay(Boolean(data.biomarker_image))
     } catch (err) {
-      console.error('Analysis failed:', err)
-      setError('Could not analyze this sample. Please try again or select another image.')
+      console.error('Real inference failed:', err)
+      setResult(null)
+      setShowOverlay(false)
+      setError(`Analysis failed: ${err.message || 'Cannot reach AI backend'}. Please ensure FastAPI backend is running on port 8000.`)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  // Explicitly labeled Mock/Simulation Mode (isolated from real inference)
+  const handleSimulate = async () => {
+    if (!selectedSample || isAnalyzing || isExporting) return
+    setIsAnalyzing(true)
+    setResult(null)
+    setShowOverlay(false)
+    setError('')
+    try {
+      const mockData = await analyzeImageMock(selectedSample.id, selectedSample.img)
+      setResult({
+        ...mockData,
+        is_simulated: true,
+        biomarker_image: null,
+        lesions: evaluateLesions(mockData.lesions ?? [], selectedSample.groundTruth, true)
+      })
+      setShowOverlay(false)
+    } catch (err) {
+      setError(`Simulation failed: ${err.message}`)
     } finally {
       setIsAnalyzing(false)
     }
@@ -82,7 +108,10 @@ function App() {
     <div className="apple-app">
       <Navbar />
       <main className="content-container">
-        <header className="page-intro"><h1>Retinal Image Analysis</h1><p>Automated fundus screening based on Beckman Clinical Classification</p></header>
+        <header className="page-intro">
+          <h1>Retinal Image Analysis</h1>
+          <p>Automated fundus screening based on Beckman Clinical Classification (Research Prototype)</p>
+        </header>
         <div className="dual-grid">
           <section className="apple-card left-card" aria-labelledby="image-title">
             <div className="card-top">
@@ -95,7 +124,18 @@ function App() {
             <InputImagePanel sample={selectedSample} result={result} isAnalyzing={isAnalyzing} showOverlay={showOverlay} />
             <ClinicalInfoPanel metadata={metadata} />
             <SampleGallery samples={SAMPLES} selected={selectedSample} onSelect={handleSelectSample} disabled={isAnalyzing || isExporting} />
-            <button type="button" className="apple-button primary" onClick={handleAnalyze} disabled={!selectedSample || isAnalyzing || isExporting}>{isAnalyzing ? 'Analyzing...' : 'Analyze Image'}</button>
+            <button type="button" className="apple-button primary" onClick={handleAnalyze} disabled={!selectedSample || isAnalyzing || isExporting}>
+              {isAnalyzing ? 'Analyzing...' : 'Analyze Image'}
+            </button>
+            <button
+              type="button"
+              className="apple-button text-button"
+              style={{ fontSize: '11px', color: 'var(--apple-secondary, #86868b)', padding: '4px 0', border: 'none', background: 'transparent', cursor: 'pointer', alignSelf: 'center' }}
+              onClick={handleSimulate}
+              disabled={!selectedSample || isAnalyzing || isExporting}
+            >
+              Run Offline Simulation (Demo Mode)
+            </button>
           </section>
           <section className="apple-card right-card" aria-label="Instructions and analysis">
             <aside className="usage-guide" aria-labelledby="usage-title">
@@ -105,19 +145,31 @@ function App() {
                 <li><strong>Analyze image</strong><p>Run analysis and review the mask.</p></li>
                 <li><strong>Review &amp; download</strong><p>Check the results and download a report.</p></li>
               </ol>
-              <details className="usage-detail"><summary>Show instructions</summary><p>Choose a sample image, select Analyze Image, then review the mask and results. Select Download PDF Report to save a report.</p></details>
+              <details className="usage-detail">
+                <summary>Show instructions</summary>
+                <p>Choose a sample image, select Analyze Image, then review the mask and results. Select Download PDF Report to save a report.</p>
+              </details>
             </aside>
             <AnalysisPanel result={result} isAnalyzing={isAnalyzing} />
             {error && <p className="notice error-notice" role="alert">{error}</p>}
-            <button type="button" className="apple-button secondary" onClick={handleDownloadPDF} disabled={!result || isAnalyzing || isExporting}>{isExporting ? 'Preparing report...' : 'Download PDF Report'}</button>
+            <button type="button" className="apple-button secondary" onClick={handleDownloadPDF} disabled={!result || isAnalyzing || isExporting}>
+              {isExporting ? 'Preparing report...' : 'Download PDF Report'}
+            </button>
           </section>
         </div>
       </main>
       <div className="report-offscreen" ref={reportRef} aria-hidden="true">
-        <ReportTemplate patientId={metadata?.patientId || 'N/A'} eyeLaterality={metadata?.eye || 'N/A'}
-          lesions={result?.lesions || []} severity={result?.severity || '—'} confidence={result?.confidence ?? '—'}
-          imageBase64={selectedSample?.img || ''} maskBase64={result?.biomarker_image || ''}
-          simulated={result?.is_simulated} approximate={result?.mm_conversion_approximate} />
+        <ReportTemplate
+          patientId={metadata?.patientId || 'N/A'}
+          eyeLaterality={metadata?.eye || 'N/A'}
+          lesions={result?.lesions || []}
+          severity={result?.severity || '—'}
+          confidence={result?.confidence ?? '—'}
+          imageBase64={selectedSample?.img || ''}
+          maskBase64={result?.biomarker_image || ''}
+          simulated={result?.is_simulated}
+          approximate={result?.mm_conversion_approximate}
+        />
       </div>
     </div>
   )

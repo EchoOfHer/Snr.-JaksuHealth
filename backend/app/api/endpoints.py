@@ -1,17 +1,25 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from PIL import Image, UnidentifiedImageError, ImageFilter
 import io
 import base64
+import math
 import numpy as np
 import traceback
+from scipy.ndimage import label
 
-# นำเข้า Class AI ของเรามาจาก inference.py
-from services.inference import SegformerPredictor, MODEL_WEIGHTS_PATH
+# Import inference service and constants
+from services.inference import (
+    SegformerPredictor,
+    MODEL_WEIGHTS_PATH,
+    CLASS_INFO,
+    CLASSES,
+    NUM_CLASSES,
+)
 
 router = APIRouter()
 
 # ---------------------------------------------------------
-# 1. ระบบโหลดโมเดลพร้อมจัดการ Error (Try-Except)
+# 1. Model Initialization
 # ---------------------------------------------------------
 print("Loading Model ...")
 try:
@@ -21,172 +29,217 @@ try:
 except Exception as e:
     predictor = None
     MODEL_READY = False
-    print(f"Model loading is error: {e}")
-    # เก็บ Log ตัวแดงไว้ดูตอน Debug
+    print(f"Model loading error: {e}")
     traceback.print_exc()
 
+
 # ---------------------------------------------------------
-# 2. API เช็คสถานะเซิร์ฟเวอร์ (Health Check)
+# 2. Server Health Check
 # ---------------------------------------------------------
 @router.get("/status")
 def get_system_status():
-    """Checking Server health """
-    if MODEL_READY:
+    """Checking Server and Model health"""
+    if MODEL_READY and predictor is not None:
         return {"status": "ok", "message": "API and Model are ready!"}
     else:
-        # 503 = Service Unavailable (เซิร์ฟเวอร์พังหรือไม่พร้อม)
-        raise HTTPException(status_code=503, detail="Server is ready but Model error")
+        raise HTTPException(status_code=503, detail="Server is ready but Model is unavailable")
+
 
 # ---------------------------------------------------------
-# 3. API สำหรับทำนายผล (พร้อมดักจับ Error ระหว่างทาง)
+# 3. Prediction Endpoint
 # ---------------------------------------------------------
 @router.post("/predict")
-async def predict_lesion(file: UploadFile = File(...)):
-    # ดัก Error ชั้นที่ 1: เช็คว่าโมเดลพร้อมรันไหม?
-    if not MODEL_READY:
-        raise HTTPException(status_code=503, detail="Model err")
+async def predict_lesion(
+    file: UploadFile = File(...),
+    input_type: str = Form("raw_fundus"),
+):
+    """
+    SegFormer-B5 multi-label retinal lesion segmentation.
+    Supports input_type:
+      - 'raw_fundus': original fundus photograph requiring complete PreTrain pipeline
+      - 'preprocessed': image already processed by PreTrain pipeline (no double enhancement)
+    """
+    if not MODEL_READY or predictor is None:
+        raise HTTPException(status_code=503, detail="Model is not ready or failed to load")
 
-    # ดัก Error ชั้นที่ 2: ตรวจสอบประเภทไฟล์
     if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File format is not picute")
-    
+        raise HTTPException(status_code=400, detail="Uploaded file is not an image")
+
+    # Normalize input_type
+    clean_input_type = input_type.strip().lower()
+    if clean_input_type not in ["raw_fundus", "preprocessed"]:
+        clean_input_type = "raw_fundus"
+
     try:
-        # อ่านไฟล์รูปภาพเข้า RAM
         image_bytes = await file.read()
         image = Image.open(io.BytesIO(image_bytes))
-        
-        # 🌟 ดึง Metadata แบบเจาะลึก (รองรับ TIFF Tags และ EXIF)
+
+        # Extract deep metadata (TIFF tags and EXIF)
         metadata = {}
-        # 1. ลองดึง TIFF Tags (สำหรับไฟล์ .tif)
         if hasattr(image, "tag_v2"):
             from PIL.TiffTags import TAGS
             for tag_id, value in image.tag_v2.items():
-                # แปลงรหัสตัวเลขเป็นชื่อ Tag ที่อ่านรู้เรื่อง (เช่น 270 -> ImageDescription)
                 tag_name = TAGS.get(tag_id, f"Unknown_Tag_{tag_id}")
-                # ข้าม Tag ที่เป็นข้อมูลขยะ (เช่น StripOffsets) เพราะมันยาวมาก
                 if tag_name not in ["StripOffsets", "StripByteCounts", "TileOffsets", "TileByteCounts"]:
                     metadata[tag_name] = str(value)
-                    
-        # 2. ถ้าเป็น JPG/PNG ลองดึง EXIF ปกติ
         elif hasattr(image, "_getexif") and image._getexif() is not None:
             from PIL.ExifTags import TAGS
             for tag_id, value in image._getexif().items():
                 tag_name = TAGS.get(tag_id, tag_id)
                 metadata[tag_name] = str(value)
-                
-        # 3. แถมข้อมูลพื้นฐานจาก image.info เข้าไปด้วย
+
         for k, v in image.info.items():
             if k not in metadata and not isinstance(v, bytes):
                 metadata[str(k)] = str(v)
-                
-        # แปลงภาพให้เป็น RGB
+
         image_rgb = image.convert("RGB")
-        
+
     except UnidentifiedImageError:
-        # ดัก Error ชั้นที่ 3: ไฟล์อาจจะพัง หรือไม่ใช่รูปภาพจริงๆ (แค่เปลี่ยนนามสกุลหลอกมา)
-        raise HTTPException(status_code=400, detail="Cannot read the image file")
+        raise HTTPException(status_code=400, detail="Cannot read or identify image file")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Image management is err: {str(e)}")
-    
+        raise HTTPException(status_code=500, detail=f"Image reading error: {str(e)}")
+
     try:
-        # สั่งรันโมเดล AI (ใส่ try-except เผื่อเกิด Error ระหว่างคิด เช่น แรมการ์ดจอเต็ม)
-        mask, global_confidence = predictor.predict(image_rgb)
-        
-        # วาด Overlay 5 คลาส
-        CLASS_INFO = {
-            0: {"name": "OpticDisc", "color": (0, 0, 255, 0)},
-            1: {"name": "Macula", "color": (0, 255, 0, 0)},
-            2: {"name": "Exudates", "color": (0, 255, 0, 191)},
-            3: {"name": "Hemorrhages", "color": (0, 0, 255, 191)},
-            4: {"name": "Drusen", "color": (255, 0, 255, 191)},
-        }
-
-        img_rgba = image_rgb.convert("RGBA")
-        overlay_layer = Image.new("RGBA", img_rgba.size, (0, 0, 0, 0))
-        findings = {}
+        # 1. Run AI Inference Pipeline
+        mask_orig, global_confidence, extra = predictor.predict(
+            image_rgb,
+            input_type=clean_input_type
+        )
+        mask_512 = extra["mask_512"]
+        transform_info = extra["transform_info"]
 
         # ---------------------------------------------------------
-        # 4. Compute lesion statistics (count, area %, max size in mm)
+        # 2. Optic Disc Calibration (1.8 mm assumed physical diameter)
         # ---------------------------------------------------------
-        import math
-        from scipy.ndimage import label
-        
-        # Calculate SRF using OpticDisc (class 0)
-        od_mask = mask[0]
-        od_pixels = int(od_mask.sum())
-        
-        if od_pixels > 0:
-            # Dpx = equivalent diameter of Optic Disc in pixels
-            Dpx = math.sqrt(4 * od_pixels / math.pi)
-            # SRF (mm per pixel) = 1800 micrometer (1.8 mm) / Dpx
-            mm_per_pixel = 1.8 / Dpx
+        od_mask_orig = mask_orig[0]
+        od_pixels_orig = int(od_mask_orig.sum())
+
+        od_mask_512 = mask_512[0]
+        od_pixels_512 = int(od_mask_512.sum())
+
+        if od_pixels_orig > 0:
+            # Optic disc detected in original image coordinates
+            d_px = math.sqrt(4 * od_pixels_orig / math.pi)
+            mm_per_pixel = 1.8 / d_px
             mm_conversion_approximate = False
+            calibration_source = "optic_disc"
+        elif od_pixels_512 > 0:
+            # Optic disc detected in 512x512 space
+            d_px_512 = math.sqrt(4 * od_pixels_512 / math.pi)
+            mm_per_pixel = 1.8 / d_px_512
+            mm_conversion_approximate = False
+            calibration_source = "optic_disc_512"
         else:
-            # Fallback to DPI if OD is not detected
+            # Fallback when optic disc is not detected.
+            # 96 DPI is marked as approximate and NOT clinically calibrated.
             dpi_info = image.info.get('dpi') or (96, 96)
             dpi = dpi_info[0] if isinstance(dpi_info, (list, tuple)) else dpi_info
             mm_per_pixel = 25.4 / dpi if dpi else 0.0
             mm_conversion_approximate = True
+            calibration_source = "uncalibrated_fallback_96dpi"
 
-        total_pixels = mask.shape[1] * mask.shape[2]
+        # ---------------------------------------------------------
+        # 3. Biomarker Quantification
+        # ---------------------------------------------------------
+        total_pixels_512 = 512 * 512
+        total_pixels_orig = mask_orig.shape[1] * mask_orig.shape[2]
+
         lesions = []
+        findings = {}
 
         for class_idx, info in CLASS_INFO.items():
-            sample_mask = mask[class_idx]
-            pixel_sum = int(sample_mask.sum())
-            # Connected component labeling for distinct lesions
-            labeled, n_features = label(sample_mask)
-            count = int(n_features)
-            # Area percentage
-            area_percentage = (pixel_sum / total_pixels * 100) if total_pixels else 0.0
-            # Largest component size (pixels) and equivalent diameter
-            if n_features > 0:
-                component_sizes = np.bincount(labeled.ravel())[1:]  # exclude background
-                largest_px = int(component_sizes.max())
-                equiv_diameter_px = math.sqrt(4 * largest_px / math.pi)
-                max_mm = round(equiv_diameter_px * mm_per_pixel, 2)
+            # Strict unblurred binary masks
+            bin_mask_orig = mask_orig[class_idx]
+            bin_mask_512 = mask_512[class_idx]
+
+            pixels_orig = int(bin_mask_orig.sum())
+            pixels_512 = int(bin_mask_512.sum())
+
+            # Connected component labeling in original coordinates
+            labeled_orig, n_features_orig = label(bin_mask_orig)
+            count = int(n_features_orig)
+
+            # Area percentage in model coordinates (matches training benchmark)
+            area_pct_512 = (pixels_512 / total_pixels_512 * 100) if total_pixels_512 else 0.0
+            area_pct_orig = (pixels_orig / total_pixels_orig * 100) if total_pixels_orig else 0.0
+
+            # Largest connected lesion and equivalent diameter
+            if n_features_orig > 0:
+                sizes_orig = np.bincount(labeled_orig.ravel())[1:]
+                largest_px_orig = int(sizes_orig.max())
+                equiv_diam_px = math.sqrt(4 * largest_px_orig / math.pi)
+                max_mm = round(equiv_diam_px * mm_per_pixel, 2) if mm_per_pixel else 0.0
             else:
+                largest_px_orig = 0
                 max_mm = 0.0
+
             lesions.append({
                 "type": info["name"],
                 "color": f"#{info['color'][0]:02X}{info['color'][1]:02X}{info['color'][2]:02X}",
                 "count": count,
-                "area_percentage": round(area_percentage, 2),
+                # area_percentage formatted for backward compatibility with frontend
+                "area_percentage": round(area_pct_512, 2),
+                "area_percentage_512": round(area_pct_512, 4),
+                "area_percentage_orig": round(area_pct_orig, 4),
+                "pixel_count_512": pixels_512,
+                "pixel_count_orig": pixels_orig,
+                "largest_component_px_orig": largest_px_orig,
                 "max_mm": max_mm,
             })
-            if pixel_sum > 0:
-                findings[info["name"]] = pixel_sum
 
-        # Create overlay image as before
+            if pixels_orig > 0:
+                findings[info["name"]] = pixels_orig
+
+        # ---------------------------------------------------------
+        # 4. Create Visual Mask Overlay (Soft blurred edge for UI rendering only)
+        # ---------------------------------------------------------
+        img_rgba = image_rgb.convert("RGBA")
+        overlay_layer = Image.new("RGBA", img_rgba.size, (0, 0, 0, 0))
+
         for class_idx, info in CLASS_INFO.items():
-            sample_mask = mask[class_idx]
+            # OpticDisc and Macula have alpha=0 so they are not rendered on the overlay
+            if info["color"][3] == 0:
+                continue
+
+            sample_mask = mask_orig[class_idx]
             if sample_mask.sum() > 0:
+                # Binary mask for visual rendering
                 mask_img = Image.fromarray((sample_mask * 255).astype(np.uint8), mode='L')
-                mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
+                # Blur only visual overlay layer to eliminate jagged edges on UI display
+                blurred_mask = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
                 color_layer = Image.new("RGBA", img_rgba.size, info["color"])
-                disease_layer = Image.composite(color_layer, Image.new("RGBA", img_rgba.size, (0, 0, 0, 0)), mask_img)
+                disease_layer = Image.composite(color_layer, Image.new("RGBA", img_rgba.size, (0, 0, 0, 0)), blurred_mask)
                 overlay_layer = Image.alpha_composite(overlay_layer, disease_layer)
 
         blended_image = Image.alpha_composite(img_rgba, overlay_layer).convert("RGB")
-        
-        # แปลงเป็น Base64
+
+        # Encode blended image to PNG Base64
         buffered = io.BytesIO()
         blended_image.save(buffered, format="PNG")
         base64_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        
+
         return {
             "status": "success",
             "findings": findings,
             "lesions": lesions,
             "confidence": global_confidence,
             "mm_conversion_approximate": mm_conversion_approximate,
+            "calibration": {
+                "source": calibration_source,
+                "is_approximate": mm_conversion_approximate,
+                "optic_disc_pixels": od_pixels_orig,
+                "mm_per_pixel": round(mm_per_pixel, 6) if mm_per_pixel else None,
+            },
+            "spatial_correspondence": {
+                "input_type": transform_info.get("input_type"),
+                "model_coordinate_system": [512, 512],
+                "original_dimensions": [image_rgb.height, image_rgb.width],
+                "crop_bbox": transform_info.get("crop_bbox"),
+            },
             "metadata": metadata,
-            "mask_base64": base64_string
+            "mask_base64": base64_string,
         }
-        
+
     except Exception as e:
-        # ดัก Error ชั้นที่ 4: Error ระหว่างรันโมเดล (เช่น CUDA Out of Memory หรือบั๊กใน inference.py)
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Error occurs in calculation process: {str(e)}")
-
-
+        raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
